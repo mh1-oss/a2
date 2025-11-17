@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>مختبر المصفوفات | ترانزبوز · إنفيرس · محدد · رتبة</title>
+  <title>مجموعة أدوات المصفوفات | Matrix Suite</title>
   <style>
     * {
       box-sizing: border-box;
@@ -28,7 +28,7 @@
       align-items: flex-start;
     }
     .app {
-      max-width: 980px;
+      max-width: 1100px;
       width: 100%;
       padding: 28px 16px 40px;
     }
@@ -36,31 +36,46 @@
       margin: 0 0 6px;
       font-size: 1.8rem;
       text-align: center;
-      letter-spacing: 0.03em;
     }
     .subtitle {
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-muted);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .subtitle strong {
       color: var(--accent);
-      font-weight: 600;
     }
-    .badge {
+
+    /* Tabs */
+    .tabs {
       display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
-      padding: 3px 8px;
       border-radius: 999px;
-      background: var(--accent-soft);
-      color: #bbf7d0;
-      margin-left: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 2px;
+      margin: 0 auto 18px;
+      background: rgba(15, 23, 42, 0.9);
     }
-    .badge span {
-      font-size: 0.9rem;
+    .tabs-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+    .tab-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #020617;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(34,197,94,0.35);
+      transform: translateY(-1px);
     }
 
     @keyframes fadeInUp {
@@ -76,7 +91,7 @@
       box-shadow: 0 18px 40px rgba(15, 23, 42, 0.8);
       margin-bottom: 18px;
       opacity: 0;
-      animation: fadeInUp 0.5s ease forwards;
+      animation: fadeInUp 0.4s ease forwards;
     }
     .card:nth-of-type(2) { animation-delay: 0.05s; }
     .card:nth-of-type(3) { animation-delay: 0.1s; }
@@ -89,7 +104,7 @@
     }
     textarea {
       width: 100%;
-      min-height: 140px;
+      min-height: 120px;
       border-radius: 10px;
       border: 1px solid #1f2937;
       padding: 10px 12px;
@@ -115,15 +130,14 @@
     .btn-row {
       margin-top: 12px;
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
-      justify-content: flex-start;
+      gap: 8px;
     }
     button {
       border: none;
       border-radius: 999px;
-      padding: 8px 20px;
-      font-size: 0.9rem;
+      padding: 7px 18px;
+      font-size: 0.85rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -131,17 +145,17 @@
       background: radial-gradient(circle at top left, #4ade80, #22c55e);
       color: #04101c;
       font-weight: 600;
-      box-shadow: 0 12px 28px rgba(34, 197, 94, 0.35);
+      box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
       transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
     }
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 18px 36px rgba(34, 197, 94, 0.45);
+      box-shadow: 0 16px 32px rgba(34, 197, 94, 0.45);
       filter: brightness(1.05);
     }
     button:active {
       transform: translateY(0);
-      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+      box-shadow: 0 7px 18px rgba(34, 197, 94, 0.25);
       filter: brightness(0.96);
     }
     .btn-secondary {
@@ -149,15 +163,14 @@
       color: var(--text-main);
       border: 1px solid #4b5563;
       box-shadow: none;
-      font-weight: 500;
     }
     .btn-secondary:hover {
       border-color: var(--accent);
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
     }
-    .small-btn {
-      padding: 4px 12px;
-      font-size: 0.8rem;
+    .btn-small {
+      padding: 4px 10px;
+      font-size: 0.78rem;
     }
 
     .checkbox-line {
@@ -165,7 +178,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
     .checkbox-line input[type="checkbox"] {
@@ -229,27 +242,38 @@
       justify-content: space-between;
       gap: 8px;
     }
-    .matrix-output {
-      margin: 0;
-      padding: 8px 10px;
+
+    /* Matrix box using table (أوضح بكثير) */
+    .matrix-box {
+      margin-top: 4px;
       border-radius: 10px;
       border: 1px solid #111827;
       background: #020617;
-      font-family: "JetBrains Mono", Consolas, monospace;
-      font-size: 0.82rem;
+      padding: 6px;
       max-height: 260px;
       overflow: auto;
-      white-space: pre;
-      line-height: 1.4;
-      transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+    .matrix-table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+    }
+    .matrix-table td {
+      border: 1px solid #1f2937;
+      padding: 4px 6px;
+      text-align: center;
+      vertical-align: middle;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
     }
 
-    @keyframes flashBorder {
-      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); border-color: rgba(34,197,94,0.7); }
+    @keyframes flashBox {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); border-color: rgba(34,197,94,0.7); }
       100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); border-color: #111827; }
     }
-    .matrix-output.flash {
-      animation: flashBorder 0.65s ease-out;
+    .matrix-box.flash {
+      animation: flashBox 0.6s ease-out;
     }
 
     .factor-line {
@@ -264,18 +288,39 @@
       min-height: 1em;
     }
 
+    .info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      white-space: pre-line;
+    }
+
     .footer {
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 0.8rem;
       color: var(--text-muted);
       text-align: center;
     }
 
-    /* ====== Fullscreen overlay for inverse ====== */
+    /* Tabs content */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    /* Fullscreen overlay for inverse */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0,0,0,0.85);
       display: none;
       align-items: center;
       justify-content: center;
@@ -290,7 +335,7 @@
       background: #020617;
       border-radius: 16px;
       border: 1px solid var(--border-subtle);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
       padding: 16px 18px 18px;
       display: flex;
       flex-direction: column;
@@ -307,10 +352,9 @@
     .overlay-matrix {
       flex: 1;
       max-height: none;
-      font-size: 0.85rem;
-      background: #020617;
-      border: none;
-      box-shadow: none;
+    }
+    .overlay-matrix .matrix-table td {
+      font-size: 0.9rem;
     }
     .overlay-close {
       padding: 4px 12px;
@@ -325,15 +369,23 @@
 </head>
 <body>
   <div class="app">
-    <h1>مختبر المصفوفات</h1>
+    <h1>مجموعة أدوات المصفوفات</h1>
     <div class="subtitle">
-      احسب بسهولة <strong>الترانزبوز</strong>، <strong>الإنفيرس</strong>، <strong>المحدد</strong> و<strong>الرتبة</strong>
-      <span class="badge"><span>●</span> يدعم المتغيرات</span>
+      تبويب واحد لـ <strong>تحليل المصفوفة</strong> وآخر لـ <strong>عمليات المصفوفات وحل Ax = b</strong>.
     </div>
 
-    <div class="card">
-      <label for="matrixInput">المصفوفة (كل صف بسطر، والعناصر بمسافة أو فاصلة):</label>
-      <textarea id="matrixInput" placeholder="أمثلة:
+    <div class="tabs-wrapper">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="analysis">تحليل مصفوفة</button>
+        <button class="tab-btn" data-tab="ops">عمليات على المصفوفات / Ax = b</button>
+      </div>
+    </div>
+
+    <!-- تبويب 1: تحليل مصفوفة -->
+    <section id="tab-analysis" class="tab-content active">
+      <div class="card">
+        <label for="matrixInputMain">المصفوفة A (كل صف بسطر، والعناصر بمسافة أو فاصلة):</label>
+        <textarea id="matrixInputMain" placeholder="أمثلة:
 
 1 2
 3 4
@@ -344,156 +396,194 @@ c d
 1, 2, 3
 0, 1, 4
 5, 6, 0"></textarea>
-      <div class="hint">
-        ▪ افصل عناصر الصف بـ مسافة أو فاصلة ( , )<br>
-        ▪ كل صف في سطر جديد<br>
-        ▪ الترانزبوز والرتبة يعملان لأي مصفوفة، أما المحدد والإنفيرس ففقط للمصفوفات المربعة (n×n)
-      </div>
-
-      <div class="checkbox-line">
-        <input type="checkbox" id="simplifyCheckbox" />
-        <span>تبسيط النتائج بعامل مشترك عددي/رمزي بسيط إن أمكن</span>
-      </div>
-
-      <div class="btn-row">
-        <button id="computeBtn">⚙️ احسب كل شيء</button>
-        <button id="exampleBtn" class="btn-secondary">📌 مثال عددي ٣×٣</button>
-        <button id="exampleVarBtn" class="btn-secondary">📌 مثال مع متغيرات ٢×٢</button>
-      </div>
-
-      <div id="errorBox" class="error"></div>
-    </div>
-
-    <div class="card">
-      <div class="metrics-row">
-        <div class="metric">
-          <div class="metric-label">المحدد det(A)</div>
-          <div class="metric-value" id="detOutput">—</div>
+        <div class="hint">
+          ▪ الترانزبوز والرتبة يعملان لأي مصفوفة<br>
+          ▪ المحدد والإنفيرس فقط للمصفوفات المربعة (n×n)
         </div>
-        <div class="metric">
-          <div class="metric-label">الرتبة rank(A)</div>
-          <div class="metric-value" id="rankOutput">—</div>
+
+        <div class="checkbox-line">
+          <input type="checkbox" id="simplifyMain" />
+          <span>تبسيط بعامل مشترك عددي/رمزي بسيط إن أمكن</span>
         </div>
+
+        <div class="btn-row">
+          <button id="computeMainBtn">⚙️ احسب Aᵀ و A⁻¹ و det و rank</button>
+          <button id="exampleMainNumBtn" class="btn-secondary">📌 مثال عددي ٣×٣</button>
+          <button id="exampleMainVarBtn" class="btn-secondary">📌 مثال مع متغيرات ٢×٢</button>
+        </div>
+
+        <div id="errorMain" class="error"></div>
       </div>
 
-      <div class="results-grid">
-        <div class="result-block">
-          <div class="result-label">
-            <span>الترانزبوز (Aᵀ):</span>
+      <div class="card">
+        <div class="metrics-row">
+          <div class="metric">
+            <div class="metric-label">المحدد det(A)</div>
+            <div class="metric-value" id="detMain">—</div>
           </div>
-          <div class="factor-line" id="transposeFactor"></div>
-          <pre id="transposeOutput" class="matrix-output"></pre>
-        </div>
-
-        <div class="result-block">
-          <div class="result-label">
-            <span>الإنفيرس (A⁻¹):</span>
-            <button id="inverseFullscreenBtn" class="btn-secondary small-btn">🔍 عرض بالحجم الكامل</button>
+          <div class="metric">
+            <div class="metric-label">الرتبة rank(A)</div>
+            <div class="metric-value" id="rankMain">—</div>
           </div>
-          <div class="factor-line" id="inverseFactor"></div>
-          <pre id="inverseOutput" class="matrix-output"></pre>
-          <div class="small-note" id="inverseNote"></div>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-block">
+            <div class="result-label">
+              <span>الترانزبوز (Aᵀ):</span>
+            </div>
+            <div class="factor-line" id="transposeFactorMain"></div>
+            <div id="transposeBoxMain" class="matrix-box"></div>
+          </div>
+
+          <div class="result-block">
+            <div class="result-label">
+              <span>الإنفيرس (A⁻¹):</span>
+              <button id="inverseFullscreenBtnMain" class="btn-secondary btn-small">🔍 عرض بالحجم الكامل</button>
+            </div>
+            <div class="factor-line" id="inverseFactorMain"></div>
+            <div id="inverseBoxMain" class="matrix-box"></div>
+            <div class="small-note" id="inverseNoteMain"></div>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-top:8px;">
+          النتائج تُعرض في جدول بحدود واضحة؛ كل عنصر داخل خلية مستقلة حتى لو كان طويل وفيه متغيرات.
         </div>
       </div>
+    </section>
 
-      <div class="hint" style="margin-top:8px;">
-        العرض مضبوط بأعمدة متساوية مع فواصل واضحة بين العناصر (│)،  
-        حتى لو كان عندك تعابير رمزية طويلة في الإنفيرس.
+    <!-- تبويب 2: عمليات على المصفوفات -->
+    <section id="tab-ops" class="tab-content">
+      <div class="card">
+        <div class="grid-2">
+          <div>
+            <label for="matrixA">المصفوفة A:</label>
+            <textarea id="matrixA" placeholder="مثال:
+
+1 2
+3 4"></textarea>
+            <div class="hint">كل صف بسطر، العناصر بمسافة أو فاصلة.</div>
+          </div>
+          <div>
+            <label for="matrixB">المصفوفة B (للجمع/الطرح/الضرب):</label>
+            <textarea id="matrixB" placeholder="مثال:
+
+5 6
+7 8"></textarea>
+            <div class="hint">
+              للجمع/الطرح ⇒ نفس أبعاد A<br>
+              للضرب A×B ⇒ عدد أعمدة A = عدد صفوف B
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label for="vectorB">المتجه b في المعادلة Ax = b (عمودي):</label>
+          <textarea id="vectorB" placeholder="مثال b:
+
+5
+11"></textarea>
+          <div class="hint">
+            لحل Ax = b:<br>
+            ▪ A مربّعة (n×n)<br>
+            ▪ b متجه عمودي (n×1) بنفس عدد صفوف A.
+          </div>
+        </div>
+
+        <div class="checkbox-line">
+          <input type="checkbox" id="simplifyOps" />
+          <span>تبسيط الناتج بعامل مشترك عددي/رمزي بسيط إن أمكن</span>
+        </div>
+
+        <div class="btn-row">
+          <button id="addBtn">A + B</button>
+          <button id="subBtn">A − B</button>
+          <button id="mulBtn">A × B</button>
+          <button id="solveBtn">حل Ax = b</button>
+          <button id="exampleOpsBtn" class="btn-secondary">📌 أمثلة</button>
+        </div>
+
+        <div id="errorOps" class="error"></div>
       </div>
-    </div>
+
+      <div class="card">
+        <div class="result-label">الناتج:</div>
+        <div class="factor-line" id="opsFactor"></div>
+        <div id="opsResultBox" class="matrix-box"></div>
+        <div id="opsInfo" class="info"></div>
+      </div>
+    </section>
 
     <div class="footer">
-      العمليات الرمزية مبنية على نصوص بسيطة؛ في الحالات المعقدة جدًا ممكن تحتاج برنامج جبر رمزي متخصّص.
+      التبسيط الرمزي هنا بسيط (عامل مشترك فقط). للتعابير الرمزية الثقيلة جدًا مثل برامج CAS المتخصّصة ممكن تحتاج أدوات أعمق.
     </div>
   </div>
 
-  <!-- Overlay لعرض الإنفيرس بالحجم الكامل -->
+  <!-- Overlay عرض إنفيرس بالحجم الكامل -->
   <div id="inverseOverlay" class="overlay">
     <div class="overlay-content">
       <div class="overlay-header">
         <span>الإنفيرس (A⁻¹) - عرض كامل</span>
         <button id="closeOverlayBtn" class="btn-secondary overlay-close">✕ إغلاق</button>
       </div>
-      <pre id="inverseOverlayMatrix" class="matrix-output overlay-matrix"></pre>
+      <div id="inverseOverlayBox" class="matrix-box overlay-matrix"></div>
     </div>
   </div>
 
   <script>
-    // ========= أدوات للتعامل مع التعابير الرمزية =========
+    // ========= تعابير رمزية بسيطة =========
     function cleanExpr(x) {
       return (x ?? "").toString().trim();
     }
-
     function isNumeric(str) {
       const s = cleanExpr(str);
       if (!s) return false;
       const num = Number(s);
       return !Number.isNaN(num);
     }
-
     function isZero(x) {
       const s = cleanExpr(x);
       if (s === "" || s === "0") return true;
-      if (isNumeric(s)) {
-        const num = Number(s);
-        return Math.abs(num) < 1e-12;
-      }
+      if (isNumeric(s)) return Math.abs(Number(s)) < 1e-12;
       return false;
     }
-
     function addExpr(a, b) {
-      a = cleanExpr(a);
-      b = cleanExpr(b);
+      a = cleanExpr(a); b = cleanExpr(b);
       if (isZero(a)) return b || "0";
       if (isZero(b)) return a || "0";
-      if (isNumeric(a) && isNumeric(b)) {
-        return String(Number(a) + Number(b));
-      }
+      if (isNumeric(a) && isNumeric(b)) return String(Number(a) + Number(b));
       return "(" + a + ")+(" + b + ")";
     }
-
     function negateExpr(a) {
       a = cleanExpr(a);
       if (isZero(a)) return "0";
-      if (isNumeric(a)) {
-        return String(-Number(a));
-      }
+      if (isNumeric(a)) return String(-Number(a));
       return "-(" + a + ")";
     }
-
     function subExpr(a, b) {
       return addExpr(a, negateExpr(b));
     }
-
     function mulExpr(a, b) {
-      a = cleanExpr(a);
-      b = cleanExpr(b);
+      a = cleanExpr(a); b = cleanExpr(b);
       if (isZero(a) || isZero(b)) return "0";
       if (a === "1") return b;
       if (b === "1") return a;
       if (a === "-1") return negateExpr(b);
       if (b === "-1") return negateExpr(a);
-      if (isNumeric(a) && isNumeric(b)) {
-        return String(Number(a) * Number(b));
-      }
+      if (isNumeric(a) && isNumeric(b)) return String(Number(a) * Number(b));
       return "(" + a + ")*(" + b + ")";
     }
-
     function divExpr(a, b) {
-      a = cleanExpr(a);
-      b = cleanExpr(b);
-      if (isZero(b)) {
-        throw new Error("قسمة على صفر في أحد المحاور (Pivot = 0).");
-      }
+      a = cleanExpr(a); b = cleanExpr(b);
+      if (isZero(b)) throw new Error("قسمة على صفر في أحد المحاور.");
       if (isZero(a)) return "0";
       if (b === "1") return a;
-      if (isNumeric(a) && isNumeric(b)) {
-        return String(Number(a) / Number(b));
-      }
+      if (isNumeric(a) && isNumeric(b)) return String(Number(a) / Number(b));
       return "(" + a + ")/(" + b + ")";
     }
 
-    // ========= تحويل النص إلى مصفوفة =========
+    // ========= مصفوفات: قراءة ونسخ =========
     function parseMatrix(text) {
       const lines = text
         .split(/\r?\n/)
@@ -502,7 +592,6 @@ c d
       if (lines.length === 0) {
         throw new Error("النص فارغ. أدخِل المصفوفة أولاً.");
       }
-
       const matrix = lines.map(line => {
         const parts = line
           .split(/[\s,]+/)
@@ -513,28 +602,23 @@ c d
         }
         return parts;
       });
-
       const cols = matrix[0].length;
       for (let i = 1; i < matrix.length; i++) {
         if (matrix[i].length !== cols) {
           throw new Error("كل الصفوف يجب أن تحتوي على نفس عدد العناصر.");
         }
       }
-
       return matrix;
     }
-
-    function deepCopyMatrix(matrix) {
-      return matrix.map(row => row.slice());
+    function deepCopyMatrix(mat) {
+      return mat.map(r => r.slice());
     }
 
-    // ========= ترانزبوز =========
+    // ========= عمليات أساسية: ترانزبوز، محدد، رتبة، إنفيرس =========
     function transpose(matrix) {
       const rows = matrix.length;
       const cols = matrix[0].length;
-      const res = Array.from({ length: cols }, () =>
-        new Array(rows).fill("0")
-      );
+      const res = Array.from({ length: cols }, () => new Array(rows).fill("0"));
       for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
           res[j][i] = cleanExpr(matrix[i][j]);
@@ -543,155 +627,109 @@ c d
       return res;
     }
 
-    // ========= محدد =========
     function determinant(matrix) {
       const n = matrix.length;
       if (matrix[0].length !== n) {
         throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
       }
-
       const M = deepCopyMatrix(matrix).map(row => row.map(cleanExpr));
       let det = "1";
       let sign = 1;
-
       for (let col = 0; col < n; col++) {
         let pivotRow = -1;
         for (let r = col; r < n; r++) {
-          if (!isZero(M[r][col])) {
-            pivotRow = r;
-            break;
-          }
+          if (!isZero(M[r][col])) { pivotRow = r; break; }
         }
-        if (pivotRow === -1) {
-          return "0";
-        }
-
+        if (pivotRow === -1) return "0";
         if (pivotRow !== col) {
-          const tmp = M[col];
-          M[col] = M[pivotRow];
-          M[pivotRow] = tmp;
+          const tmp = M[col]; M[col] = M[pivotRow]; M[pivotRow] = tmp;
           sign *= -1;
         }
-
         const pivotVal = M[col][col];
         det = mulExpr(det, pivotVal);
-
         for (let i = col + 1; i < n; i++) {
           if (isZero(M[i][col])) continue;
           const factor = divExpr(M[i][col], pivotVal);
           for (let j = col; j < n; j++) {
-            const correction = mulExpr(factor, M[col][j]);
-            M[i][j] = subExpr(M[i][j], correction);
+            const corr = mulExpr(factor, M[col][j]);
+            M[i][j] = subExpr(M[i][j], corr);
           }
         }
       }
-
-      if (sign === -1) {
-        det = negateExpr(det);
-      }
+      if (sign === -1) det = negateExpr(det);
       return cleanExpr(det);
     }
 
-    // ========= رتبة =========
     function rank(matrix) {
       const rows = matrix.length;
       const cols = matrix[0].length;
       const M = deepCopyMatrix(matrix).map(row => row.map(cleanExpr));
       let rankVal = 0;
       let row = 0;
-
       for (let col = 0; col < cols && row < rows; col++) {
         let pivotRow = -1;
         for (let r = row; r < rows; r++) {
-          if (!isZero(M[r][col])) {
-            pivotRow = r;
-            break;
-          }
+          if (!isZero(M[r][col])) { pivotRow = r; break; }
         }
         if (pivotRow === -1) continue;
-
         if (pivotRow !== row) {
-          const tmp = M[row];
-          M[row] = M[pivotRow];
-          M[pivotRow] = tmp;
+          const tmp = M[row]; M[row] = M[pivotRow]; M[pivotRow] = tmp;
         }
-
         const pivotVal = M[row][col];
-
         for (let j = col; j < cols; j++) {
           M[row][j] = divExpr(M[row][j], pivotVal);
         }
-
         for (let i = 0; i < rows; i++) {
           if (i === row) continue;
           const factor = M[i][col];
           if (isZero(factor)) continue;
           for (let j = col; j < cols; j++) {
-            const correction = mulExpr(factor, M[row][j]);
-            M[i][j] = subExpr(M[i][j], correction);
+            const corr = mulExpr(factor, M[row][j]);
+            M[i][j] = subExpr(M[i][j], corr);
           }
         }
-
         row++;
         rankVal++;
       }
-
       return rankVal.toString();
     }
 
-    // ========= إنفيرس =========
     function inverse(matrix) {
       const n = matrix.length;
       if (matrix[0].length !== n) {
         throw new Error("الإنفيرس يُحسب فقط للمصفوفات المربّعة (n×n).");
       }
-
       const M = matrix.map((row, i) => {
         const left = row.map(x => cleanExpr(x));
-        const right = Array.from({ length: n }, (_, j) =>
-          i === j ? "1" : "0"
-        );
+        const right = Array.from({ length: n }, (_, j) => (i === j ? "1" : "0"));
         return left.concat(right);
       });
-
       const totalCols = 2 * n;
-
       for (let col = 0; col < n; col++) {
         let pivotRow = -1;
         for (let r = col; r < n; r++) {
-          if (!isZero(M[r][col])) {
-            pivotRow = r;
-            break;
-          }
+          if (!isZero(M[r][col])) { pivotRow = r; break; }
         }
         if (pivotRow === -1) {
           throw new Error("المصفوفة غير قابلة للعكس (يبدو أن المحدّد = 0).");
         }
-
         if (pivotRow !== col) {
-          const tmp = M[col];
-          M[col] = M[pivotRow];
-          M[pivotRow] = tmp;
+          const tmp = M[col]; M[col] = M[pivotRow]; M[pivotRow] = tmp;
         }
-
         const pivotVal = M[col][col];
-
         for (let j = 0; j < totalCols; j++) {
           M[col][j] = divExpr(M[col][j], pivotVal);
         }
-
         for (let i = 0; i < n; i++) {
           if (i === col) continue;
           const factor = M[i][col];
           if (isZero(factor)) continue;
-
           for (let j = 0; j < totalCols; j++) {
-            const correction = mulExpr(factor, M[col][j]);
-            M[i][j] = subExpr(M[i][j], correction);
+            const corr = mulExpr(factor, M[col][j]);
+            M[i][j] = subExpr(M[i][j], corr);
           }
         }
       }
-
       const inv = [];
       for (let i = 0; i < n; i++) {
         inv.push(M[i].slice(n, totalCols).map(cleanExpr));
@@ -699,7 +737,7 @@ c d
       return inv;
     }
 
-    // ========= GCD للأعداد =========
+    // ========= GCD & عامل مشترك رمزي بسيط =========
     function gcd(a, b) {
       a = Math.abs(a);
       b = Math.abs(b);
@@ -711,32 +749,31 @@ c d
       return a;
     }
 
-    // محاولة استخراج معامل مشترك عددي/رمزي بسيط مثل: 2, 3a, -5k
+    // يقبل:
+    // 2, -3, 2a, 2*a, (2)*a, (2)*(a), a, -a, (a), ( -a )
     function extractCoeffAndSymbol(str) {
       const s = cleanExpr(str);
-      if (s === "" || s === "0") {
-        return { coeff: 0, symbol: "" };
-      }
+      if (s === "" || s === "0") return { coeff: 0, symbol: "" };
 
       // pure integer
       if (/^[+-]?\d+$/.test(s)) {
         return { coeff: parseInt(s, 10), symbol: "" };
       }
 
-      // pattern: 2a أو 2*a أو -3k
-      let m = s.match(/^([+-]?\d+)\*?([a-zA-Z][\w]*)$/);
+      // (2)*(a) أو 2*a أو 2a
+      let m = s.match(/^\(?([+-]?\d+)\)?\*?\(?([a-zA-Z][\w]*)\)?$/);
       if (m) {
         return { coeff: parseInt(m[1], 10), symbol: m[2] };
       }
 
-      // pattern: a أو -a
-      m = s.match(/^([+-]?)([a-zA-Z][\w]*)$/);
+      // (a) أو a أو -a
+      m = s.match(/^\(?([+-]?)([a-zA-Z][\w]*)\)?$/);
       if (m) {
         const sign = m[1] === "-" ? -1 : 1;
         return { coeff: sign, symbol: m[2] };
       }
 
-      // تعبير أعقد: نرجع null
+      // تعبير أعقد: لا نتدخل به
       return null;
     }
 
@@ -749,33 +786,23 @@ c d
         for (let j = 0; j < matrix[i].length; j++) {
           const s = cleanExpr(matrix[i][j]);
           if (s === "" || s === "0") continue;
-
           const parsed = extractCoeffAndSymbol(s);
-          if (!parsed) {
-            compatible = false;
-            break outer;
-          }
-
+          if (!parsed) { compatible = false; break outer; }
           const { coeff, symbol } = parsed;
           const absVal = Math.abs(coeff);
           if (absVal === 0) continue;
-
           if (commonSymbol === null) {
-            commonSymbol = symbol; // ممكن "" (يعني فقط عددي)
-          } else {
-            // لازم يا نفس الرمز أو كلاهما بدون رمز
-            if (commonSymbol !== symbol) {
-              compatible = false;
-              break outer;
-            }
+            commonSymbol = symbol; // ممكن ""
+          } else if (commonSymbol !== symbol) {
+            compatible = false;
+            break outer;
           }
-
           if (g === 0) g = absVal;
           else g = gcd(g, absVal);
         }
       }
 
-      if (!compatible || g <= 1 && (!commonSymbol || commonSymbol === "")) {
+      if (!compatible || (g <= 1 && (!commonSymbol || commonSymbol === ""))) {
         return null;
       }
 
@@ -786,7 +813,6 @@ c d
       } else {
         factorStr = g.toString();
       }
-
       return { factorStr, coeff: g, symbol: commonSymbol };
     }
 
@@ -796,32 +822,23 @@ c d
         return { factor: null, matrix };
       }
       const { factorStr, coeff, symbol } = info;
-
       const simplified = matrix.map(row =>
         row.map(cell => {
           const s = cleanExpr(cell);
           if (s === "" || s === "0") return "0";
-
           const parsed = extractCoeffAndSymbol(s);
-          if (!parsed) {
-            // احتياطًا لو صار شيء غريب
-            return s;
-          }
+          if (!parsed) return s; // إذا تعبير أعقد، نخليه كما هو
           let { coeff: c, symbol: sym } = parsed;
           const newCoeff = c / coeff;
 
-          // إذا ماكو رمز
           if (!sym) {
             return String(newCoeff);
           }
-
-          // إذا رمز مشترك
           if (symbol && sym === symbol) {
             if (newCoeff === 1) return sym;
             if (newCoeff === -1) return "-" + sym;
             return String(newCoeff) + sym;
           }
-
           return s;
         })
       );
@@ -829,54 +846,16 @@ c d
       return { factor: factorStr, matrix: simplified };
     }
 
-    // ========= تنسيق المصفوفة بفواصل واضحة =========
-    function formatMatrixPretty(mat) {
-      if (!mat || mat.length === 0) return "—";
-      const rows = mat.length;
-      const cols = mat[0].length;
-      const colWidths = new Array(cols).fill(0);
-
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          const s = cleanExpr(mat[i][j]);
-          if (s.length > colWidths[j]) {
-            colWidths[j] = s.length;
-          }
-        }
-      }
-
-      const lines = [];
-      for (let i = 0; i < rows; i++) {
-        const parts = [];
-        for (let j = 0; j < cols; j++) {
-          const s = cleanExpr(mat[i][j]);
-          const padded = s.padStart(colWidths[j], " ");
-          parts.push(padded);
-        }
-        const rowText = parts.join(" │ ");
-        if (i === 0 && rows === 1) {
-          lines.push("⎡ " + rowText + " ⎤");
-        } else if (i === 0) {
-          lines.push("⎡ " + rowText + " ⎤");
-        } else if (i === rows - 1) {
-          lines.push("⎣ " + rowText + " ⎦");
-        } else {
-          lines.push("⎢ " + rowText + " ⎥");
-        }
-      }
-
-      return lines.join("\n");
-    }
-
-    function renderMatrix(matrix, outputId, factorId, simplifyOn) {
-      const outEl = document.getElementById(outputId);
+    // ========= عرض المصفوفة في جدول واضح =========
+    function renderMatrix(matrix, boxId, factorId, simplifyOn) {
+      const box = document.getElementById(boxId);
       const factorEl = factorId ? document.getElementById(factorId) : null;
 
-      outEl.textContent = "";
+      box.innerHTML = "";
       if (factorEl) factorEl.textContent = "";
 
       if (!matrix || matrix.length === 0) {
-        outEl.textContent = "—";
+        box.textContent = "—";
         return;
       }
 
@@ -889,109 +868,300 @@ c d
         matToShow = simp.matrix;
       }
 
-      if (factorEl && factor) {
-        factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
+      if (factorEl) {
+        if (factor) {
+          factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
+        } else {
+          factorEl.textContent = "لم يتم إيجاد عامل مشترك بسيط للتبسيط.";
+        }
       }
 
-      outEl.textContent = formatMatrixPretty(matToShow);
+      const table = document.createElement("table");
+      table.className = "matrix-table";
+      const tbody = document.createElement("tbody");
 
-      outEl.classList.remove("flash");
-      void outEl.offsetWidth;
-      outEl.classList.add("flash");
+      for (const row of matToShow) {
+        const tr = document.createElement("tr");
+        for (const cell of row) {
+          const td = document.createElement("td");
+          td.textContent = cleanExpr(cell) || "0";
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      box.appendChild(table);
+
+      box.classList.remove("flash");
+      void box.offsetWidth;
+      box.classList.add("flash");
     }
 
-    // ========= ربط الواجهة =========
-    const inputEl = document.getElementById("matrixInput");
-    const transposeOut = document.getElementById("transposeOutput");
-    const inverseOut = document.getElementById("inverseOutput");
-    const detOut = document.getElementById("detOutput");
-    const rankOut = document.getElementById("rankOutput");
-    const errorBox = document.getElementById("errorBox");
-    const simplifyCheckbox = document.getElementById("simplifyCheckbox");
-    const inverseNote = document.getElementById("inverseNote");
-    const transposeFactorEl = document.getElementById("transposeFactor");
-    const inverseFactorEl = document.getElementById("inverseFactor");
+    // ========= عمليات للمصفوفات في تبويب العمليات =========
+    function addMatrices(A, B) {
+      if (A.length !== B.length || A[0].length !== B[0].length) {
+        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
+      }
+      const m = A.length, n = A[0].length;
+      const C = Array.from({ length: m }, () => Array(n).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          C[i][j] = addExpr(A[i][j], B[i][j]);
+        }
+      }
+      return C;
+    }
+    function subMatrices(A, B) {
+      if (A.length !== B.length || A[0].length !== B[0].length) {
+        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
+      }
+      const m = A.length, n = A[0].length;
+      const C = Array.from({ length: m }, () => Array(n).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          C[i][j] = subExpr(A[i][j], B[i][j]);
+        }
+      }
+      return C;
+    }
+    function mulMatrices(A, B) {
+      const m = A.length, n = A[0].length, p = B[0].length;
+      if (B.length !== n) {
+        throw new Error("لـ A×B: عدد أعمدة A يجب أن يساوي عدد صفوف B.");
+      }
+      const C = Array.from({ length: m }, () => Array(p).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < p; j++) {
+          let sum = "0";
+          for (let k = 0; k < n; k++) {
+            sum = addExpr(sum, mulExpr(A[i][k], B[k][j]));
+          }
+          C[i][j] = sum;
+        }
+      }
+      return C;
+    }
 
-    document.getElementById("computeBtn").addEventListener("click", () => {
-      errorBox.style.display = "none";
-      errorBox.textContent = "";
+    function formatVectorNames(mat) {
+      if (!mat || mat[0].length !== 1) return "";
+      const lines = [];
+      for (let i = 0; i < mat.length; i++) {
+        const name = "x" + (i + 1);
+        lines.push(name + " = " + cleanExpr(mat[i][0]));
+      }
+      return lines.join("\n");
+    }
 
-      detOut.textContent = "—";
-      rankOut.textContent = "—";
-      transposeOut.textContent = "";
-      inverseOut.textContent = "";
-      inverseNote.textContent = "";
-      transposeFactorEl.textContent = "";
-      inverseFactorEl.textContent = "";
+    // ========= Tabs switching =========
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        tabButtons.forEach(b => b.classList.remove("active"));
+        tabContents.forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + tab).classList.add("active");
+      });
+    });
+
+    // ========= ربط تبويب تحليل المصفوفة =========
+    const matrixInputMain = document.getElementById("matrixInputMain");
+    const simplifyMain = document.getElementById("simplifyMain");
+    const detMain = document.getElementById("detMain");
+    const rankMain = document.getElementById("rankMain");
+    const errorMain = document.getElementById("errorMain");
+    const inverseNoteMain = document.getElementById("inverseNoteMain");
+
+    document.getElementById("computeMainBtn").addEventListener("click", () => {
+      errorMain.style.display = "none";
+      errorMain.textContent = "";
+      detMain.textContent = "—";
+      rankMain.textContent = "—";
+      inverseNoteMain.textContent = "";
+      document.getElementById("transposeBoxMain").innerHTML = "";
+      document.getElementById("inverseBoxMain").innerHTML = "";
+      document.getElementById("transposeFactorMain").textContent = "";
+      document.getElementById("inverseFactorMain").textContent = "";
 
       try {
-        const text = inputEl.value;
-        const A = parseMatrix(text);
-        const simplifyOn = simplifyCheckbox.checked;
+        const A = parseMatrix(matrixInputMain.value);
+        const simplifyOn = simplifyMain.checked;
 
         const AT = transpose(A);
-        renderMatrix(AT, "transposeOutput", "transposeFactor", simplifyOn);
+        renderMatrix(AT, "transposeBoxMain", "transposeFactorMain", simplifyOn);
 
         const rnk = rank(A);
-        rankOut.textContent = rnk;
+        rankMain.textContent = rnk;
 
         if (A.length === A[0].length) {
           const detVal = determinant(A);
-          detOut.textContent = detVal || "0";
-
+          detMain.textContent = detVal || "0";
           try {
             const invMat = inverse(A);
-            inverseNote.textContent = "";
-            renderMatrix(invMat, "inverseOutput", "inverseFactor", simplifyOn);
+            renderMatrix(invMat, "inverseBoxMain", "inverseFactorMain", simplifyOn);
           } catch (eInv) {
-            inverseFactorEl.textContent = "";
-            inverseOut.textContent =
-              "لا يمكن إيجاد الإنفيرس لهذه المصفوفة.\n" +
-              (eInv.message || "");
-            inverseNote.textContent =
+            document.getElementById("inverseBoxMain").textContent =
+              "لا يمكن إيجاد الإنفيرس لهذه المصفوفة.\n" + (eInv.message || "");
+            document.getElementById("inverseFactorMain").textContent = "";
+            inverseNoteMain.textContent =
               "غالبًا المحدّد يساوي صفر أو أن A مفردة.";
           }
         } else {
-          detOut.textContent = "غير معرّف للمصفوفة غير المربّعة.";
-          inverseOut.textContent =
+          detMain.textContent = "غير معرّف للمصفوفة غير المربّعة.";
+          document.getElementById("inverseBoxMain").textContent =
             "الإنفيرس يُعرّف فقط للمصفوفات المربّعة (n×n).";
-          inverseNote.textContent =
-            "يمكنك مع ذلك استخدام الترانزبوز والرتبة لهذه المصفوفة.";
+          inverseNoteMain.textContent =
+            "يمكنك استخدام الترانزبوز والرتبة حتى لو A ليست مربّعة.";
         }
       } catch (err) {
-        errorBox.textContent = err.message || String(err);
-        errorBox.style.display = "block";
+        errorMain.textContent = err.message || String(err);
+        errorMain.style.display = "block";
       }
     });
 
-    document.getElementById("exampleBtn").addEventListener("click", () => {
-      inputEl.value = "1 2 3\n0 1 4\n5 6 0";
+    document.getElementById("exampleMainNumBtn").addEventListener("click", () => {
+      matrixInputMain.value = "1 2 3\n0 1 4\n5 6 0";
+    });
+    document.getElementById("exampleMainVarBtn").addEventListener("click", () => {
+      matrixInputMain.value = "a b\nc d";
     });
 
-    document.getElementById("exampleVarBtn").addEventListener("click", () => {
-      inputEl.value = "a b\nc d";
-    });
-
-    // ====== overlay للإنفيرس بالحجم الكامل ======
+    // ========= Overlay للإنفيرس بالحجم الكامل =========
     const inverseOverlay = document.getElementById("inverseOverlay");
-    const inverseOverlayMatrix = document.getElementById("inverseOverlayMatrix");
-    const inverseFullscreenBtn = document.getElementById("inverseFullscreenBtn");
+    const inverseOverlayBox = document.getElementById("inverseOverlayBox");
+    const inverseFullscreenBtnMain = document.getElementById("inverseFullscreenBtnMain");
     const closeOverlayBtn = document.getElementById("closeOverlayBtn");
-
-    inverseFullscreenBtn.addEventListener("click", () => {
-      inverseOverlayMatrix.textContent =
-        inverseOut.textContent || "لا توجد نتيجة إنفيرس حالية.";
+    inverseFullscreenBtnMain.addEventListener("click", () => {
+      inverseOverlayBox.innerHTML = document.getElementById("inverseBoxMain").innerHTML || "لا توجد نتيجة إنفيرس حالياً.";
       inverseOverlay.classList.add("show");
     });
-
     closeOverlayBtn.addEventListener("click", () => {
       inverseOverlay.classList.remove("show");
     });
-
     inverseOverlay.addEventListener("click", (e) => {
       if (e.target === inverseOverlay) {
         inverseOverlay.classList.remove("show");
       }
+    });
+
+    // ========= تبويب العمليات =========
+    const AEl = document.getElementById("matrixA");
+    const BEl = document.getElementById("matrixB");
+    const bEl = document.getElementById("vectorB");
+    const errorOps = document.getElementById("errorOps");
+    const opsInfo = document.getElementById("opsInfo");
+    const simplifyOps = document.getElementById("simplifyOps");
+
+    function renderOpsResult(matrix, infoText) {
+      const box = document.getElementById("opsResultBox");
+      const factorEl = document.getElementById("opsFactor");
+      box.innerHTML = "";
+      factorEl.textContent = "";
+      opsInfo.textContent = infoText || "";
+
+      if (!matrix) {
+        box.textContent = "—";
+        return;
+      }
+
+      let matToShow = matrix;
+      let factor = null;
+      if (simplifyOps.checked) {
+        const simp = simplifyMatrixCommonFactor(matrix);
+        factor = simp.factor;
+        matToShow = simp.matrix;
+      }
+      if (factor) {
+        factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
+      } else if (simplifyOps.checked) {
+        factorEl.textContent = "لم يتم إيجاد عامل مشترك بسيط للتبسيط.";
+      }
+
+      const table = document.createElement("table");
+      table.className = "matrix-table";
+      const tbody = document.createElement("tbody");
+      for (const row of matToShow) {
+        const tr = document.createElement("tr");
+        for (const cell of row) {
+          const td = document.createElement("td");
+          td.textContent = cleanExpr(cell) || "0";
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      box.appendChild(table);
+
+      box.classList.remove("flash");
+      void box.offsetWidth;
+      box.classList.add("flash");
+    }
+
+    document.getElementById("addBtn").addEventListener("click", () => {
+      errorOps.style.display = "none"; errorOps.textContent = "";
+      try {
+        const A = parseMatrix(AEl.value);
+        const B = parseMatrix(BEl.value);
+        const C = addMatrices(A, B);
+        renderOpsResult(C, "الناتج: A + B");
+      } catch (err) {
+        errorOps.textContent = err.message || String(err);
+        errorOps.style.display = "block";
+      }
+    });
+
+    document.getElementById("subBtn").addEventListener("click", () => {
+      errorOps.style.display = "none"; errorOps.textContent = "";
+      try {
+        const A = parseMatrix(AEl.value);
+        const B = parseMatrix(BEl.value);
+        const C = subMatrices(A, B);
+        renderOpsResult(C, "الناتج: A − B");
+      } catch (err) {
+        errorOps.textContent = err.message || String(err);
+        errorOps.style.display = "block";
+      }
+    });
+
+    document.getElementById("mulBtn").addEventListener("click", () => {
+      errorOps.style.display = "none"; errorOps.textContent = "";
+      try {
+        const A = parseMatrix(AEl.value);
+        const B = parseMatrix(BEl.value);
+        const C = mulMatrices(A, B);
+        renderOpsResult(C, "الناتج: A × B");
+      } catch (err) {
+        errorOps.textContent = err.message || String(err);
+        errorOps.style.display = "block";
+      }
+    });
+
+    document.getElementById("solveBtn").addEventListener("click", () => {
+      errorOps.style.display = "none"; errorOps.textContent = "";
+      try {
+        const A = parseMatrix(AEl.value);
+        const b = parseMatrix(bEl.value);
+        if (b[0].length !== 1) throw new Error("b يجب أن يكون متجه عمودي (عمود واحد).");
+        if (A.length !== A[0].length) throw new Error("A لازم مربّعة (n×n) لحل Ax = b.");
+        if (A.length !== b.length) throw new Error("عدد صفوف A لازم يساوي عدد عناصر b.");
+
+        const Ainv = inverse(A);
+        const X = mulMatrices(Ainv, b);
+        const names = formatVectorNames(X);
+        let info = "حل Ax = b باستخدام x = A⁻¹ b.";
+        if (names) info += "\n\nالقيم الفردية للمتغيرات:\n" + names;
+        renderOpsResult(X, info);
+      } catch (err) {
+        errorOps.textContent = err.message || String(err);
+        errorOps.style.display = "block";
+      }
+    });
+
+    document.getElementById("exampleOpsBtn").addEventListener("click", () => {
+      AEl.value = "1 2\n3 4";
+      BEl.value = "5 6\n7 8";
+      bEl.value = "5\n11";
     });
   </script>
 </body>
