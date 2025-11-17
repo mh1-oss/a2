@@ -2,52 +2,90 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>حاسبة المصفوفات (ترانزبوز & إنفيرس)</title>
+  <title>مختبر المصفوفات | ترانزبوز · إنفيرس · محدد · رتبة</title>
   <style>
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+    :root {
+      --bg: #050816;
+      --card: #020617;
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.18);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
     body {
       margin: 0;
       padding: 0;
-      background: #0f172a;
-      color: #e5e7eb;
+      background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      min-height: 100vh;
     }
     .app {
-      max-width: 900px;
+      max-width: 980px;
       width: 100%;
-      padding: 24px 16px 40px;
+      padding: 28px 16px 40px;
     }
     h1 {
-      margin-top: 0;
-      margin-bottom: 8px;
-      font-size: 1.7rem;
+      margin: 0 0 6px;
+      font-size: 1.8rem;
       text-align: center;
+      letter-spacing: 0.03em;
     }
     .subtitle {
       text-align: center;
       font-size: 0.9rem;
-      color: #9ca3af;
-      margin-bottom: 20px;
-    }
-    .card {
-      background: #020617;
-      border-radius: 14px;
-      padding: 16px 16px 18px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-muted);
       margin-bottom: 18px;
     }
+    .subtitle strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #bbf7d0;
+      margin-left: 4px;
+    }
+    .badge span {
+      font-size: 0.9rem;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 16px 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.8);
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .card:nth-of-type(2) { animation-delay: 0.05s; }
+    .card:nth-of-type(3) { animation-delay: 0.1s; }
+
     label {
       display: block;
       font-size: 0.9rem;
       margin-bottom: 6px;
-      color: #e5e7eb;
+      color: var(--text-main);
     }
     textarea {
       width: 100%;
@@ -59,19 +97,21 @@
       font-family: "JetBrains Mono", Consolas, monospace;
       font-size: 0.9rem;
       background: #020617;
-      color: #e5e7eb;
+      color: var(--text-main);
       outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
     textarea:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px #38bdf8;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
     }
     .hint {
       font-size: 0.8rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-top: 4px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
+
     .btn-row {
       margin-top: 12px;
       display: flex;
@@ -82,49 +122,55 @@
     button {
       border: none;
       border-radius: 999px;
-      padding: 8px 18px;
+      padding: 8px 20px;
       font-size: 0.9rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-      color: #020617;
+      background: radial-gradient(circle at top left, #4ade80, #22c55e);
+      color: #04101c;
       font-weight: 600;
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.35);
+      box-shadow: 0 12px 28px rgba(34, 197, 94, 0.35);
       transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
     }
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 16px 32px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 18px 36px rgba(34, 197, 94, 0.45);
       filter: brightness(1.05);
     }
     button:active {
       transform: translateY(0);
-      box-shadow: 0 8px 18px rgba(56, 189, 248, 0.25);
-      filter: brightness(0.97);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+      filter: brightness(0.96);
     }
     .btn-secondary {
       background: transparent;
-      color: #e5e7eb;
+      color: var(--text-main);
       border: 1px solid #4b5563;
       box-shadow: none;
+      font-weight: 500;
     }
     .btn-secondary:hover {
-      border-color: #9ca3af;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.8);
+      border-color: var(--accent);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
     }
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
+
+    .checkbox-line {
       margin-top: 10px;
-    }
-    .result-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.85rem;
-      margin-bottom: 4px;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
+    .checkbox-line input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
     .error {
       margin-top: 10px;
       padding: 8px 10px;
@@ -136,90 +182,174 @@
       display: none;
       white-space: pre-line;
     }
-    .badge {
-      display: inline-flex;
-      align-items: center;
+
+    .metrics-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .metric {
+      flex: 1 1 180px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: radial-gradient(circle at top left, rgba(34,197,94,0.08), rgba(15,23,42,0.9));
+    }
+    .metric-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .metric-value {
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 6px;
+    }
+    .result-block {
+      display: flex;
+      flex-direction: column;
       gap: 4px;
+    }
+    .result-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .matrix-output {
+      margin: 0;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      background: #020617;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 0.82rem;
+      max-height: 260px;
+      overflow: auto;
+      white-space: pre;
+      line-height: 1.4;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    @keyframes flashBorder {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); border-color: rgba(34,197,94,0.7); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); border-color: #111827; }
+    }
+    .matrix-output.flash {
+      animation: flashBorder 0.65s ease-out;
+    }
+
+    .factor-line {
+      font-size: 0.78rem;
+      color: #a5b4fc;
+      min-height: 1em;
+    }
+    .small-note {
+      margin-top: 3px;
       font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15, 118, 110, 0.18);
-      color: #99f6e4;
-      margin-left: 4px;
+      color: var(--text-muted);
+      min-height: 1em;
     }
-    .badge span {
-      font-size: 0.95rem;
-    }
+
     .footer {
-      margin-top: 10px;
+      margin-top: 6px;
       font-size: 0.8rem;
-      color: #6b7280;
+      color: var(--text-muted);
       text-align: center;
     }
+
     @media (max-width: 640px) {
       .card { padding: 12px 12px 14px; }
-      h1 { font-size: 1.4rem; }
+      h1 { font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>حاسبة المصفوفات</h1>
+    <h1>مختبر المصفوفات</h1>
     <div class="subtitle">
-      أدخِل المصفوفة، ثم اضغط "احسب" لإيجاد
-      <strong>الترانزبوز</strong> و<strong>الإنفيرس</strong>
+      احسب بسهولة <strong>الترانزبوز</strong>، <strong>الإنفيرس</strong>، <strong>المحدد</strong> و<strong>الرتبة</strong>
       <span class="badge"><span>●</span> يدعم المتغيرات</span>
     </div>
 
     <div class="card">
-      <label for="matrixInput">المصفوفة (صفوف جديدة + فراغات أو فواصل بين العناصر):</label>
-      <textarea id="matrixInput" placeholder="مثال ٢×٢:
+      <label for="matrixInput">المصفوفة (كل صف بسطر، والعناصر بمسافة أو فاصلة):</label>
+      <textarea id="matrixInput" placeholder="أمثلة:
 
 1 2
 3 4
 
-أو مع متغيرات:
-
 a b
-c d"></textarea>
+c d
+
+1, 2, 3
+0, 1, 4
+5, 6, 0"></textarea>
       <div class="hint">
-        ▪ افصل عناصر الصف الواحد بمسافة أو فاصلة ( , )<br>
+        ▪ افصل عناصر الصف بـ مسافة أو فاصلة ( , )<br>
         ▪ كل صف في سطر جديد<br>
-        ▪ الإنفيرس ممكن يرفض إذا المصفوفة غير قابلة للعكس (det = 0 تقريبًا)
+        ▪ الترانزبوز والرتبة يعملان لأي مصفوفة، أما المحدد والإنفيرس ففقط للمصفوفات المربعة (n×n)
+      </div>
+
+      <div class="checkbox-line">
+        <input type="checkbox" id="simplifyCheckbox" />
+        <span>تبسيط النتائج بعامل مشترك عددي إن أمكن (للمصفوفات ذات العناصر الصحيحة)</span>
       </div>
 
       <div class="btn-row">
-        <button id="computeBtn">⚙️ احسب الترانزبوز والإنفيرس</button>
-        <button id="exampleBtn" class="btn-secondary">📌 مثال عددي</button>
-        <button id="exampleVarBtn" class="btn-secondary">📌 مثال مع متغيرات</button>
+        <button id="computeBtn">⚙️ احسب كل شيء</button>
+        <button id="exampleBtn" class="btn-secondary">📌 مثال عددي ٣×٣</button>
+        <button id="exampleVarBtn" class="btn-secondary">📌 مثال مع متغيرات ٢×٢</button>
       </div>
 
       <div id="errorBox" class="error"></div>
     </div>
 
     <div class="card">
-      <div class="results-grid">
-        <div>
-          <div class="result-label">الترانزبوز (Aᵀ):</div>
-          <textarea id="transposeOutput" readonly></textarea>
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="metric-label">المحدد det(A)</div>
+          <div class="metric-value" id="detOutput">—</div>
         </div>
-        <div>
-          <div class="result-label">الإنفيرس (A⁻¹):</div>
-          <textarea id="inverseOutput" readonly></textarea>
+        <div class="metric">
+          <div class="metric-label">الرتبة rank(A)</div>
+          <div class="metric-value" id="rankOutput">—</div>
         </div>
       </div>
+
+      <div class="results-grid">
+        <div class="result-block">
+          <div class="result-label">الترانزبوز (Aᵀ):</div>
+          <div class="factor-line" id="transposeFactor"></div>
+          <pre id="transposeOutput" class="matrix-output"></pre>
+        </div>
+
+        <div class="result-block">
+          <div class="result-label">الإنفيرس (A⁻¹):</div>
+          <div class="factor-line" id="inverseFactor"></div>
+          <pre id="inverseOutput" class="matrix-output"></pre>
+          <div class="small-note" id="inverseNote"></div>
+        </div>
+      </div>
+
       <div class="hint" style="margin-top:8px;">
-        المخرجات تظهر كـ مصفوفة؛ كل سطر = صف، وكل عنصر مفصول بـ Tab (أو مسافة كبيرة).
+        العرض منسّق أعمدة بحيث تكون المصفوفة واضحة حتى مع المتغيرات الكبيرة.  
+        في الحالات الرمزية المعقدة نَفترض الحدود غير صفرية ما لم يثبت غير ذلك.
       </div>
     </div>
 
     <div class="footer">
-      ملاحظة: التعامل مع المتغيرات رمزي (كسلاسل نصية)، لذلك التعبيرات قد لا تُبسَّط بالكامل.
+      تم بناء العمليات بشكل رمزي بسيط (String-based)، لذلك بعض التعابير قد لا تُبسّط بالكامل كما في برامج الجبر الرمزي المتقدّمة.
     </div>
   </div>
 
   <script>
-    // ====== أدوات بسيطة للتعامل مع التعابير الرمزية (نصوص) ======
+    // ========= أدوات للتعامل مع التعابير الرمزية (كسلاسل نصية) =========
     function cleanExpr(x) {
       return (x ?? "").toString().trim();
     }
@@ -233,8 +363,7 @@ c d"></textarea>
 
     function isZero(x) {
       const s = cleanExpr(x);
-      if (s === "") return true;
-      if (s === "0") return true;
+      if (s === "" || s === "0") return true;
       if (isNumeric(s)) {
         const num = Number(s);
         return Math.abs(num) < 1e-12;
@@ -248,7 +377,6 @@ c d"></textarea>
       b = cleanExpr(b);
       if (isZero(a)) return b || "0";
       if (isZero(b)) return a || "0";
-      // لو رقمين، اجمعهم مباشرة
       if (isNumeric(a) && isNumeric(b)) {
         return String(Number(a) + Number(b));
       }
@@ -296,7 +424,7 @@ c d"></textarea>
       return "(" + a + ")/(" + b + ")";
     }
 
-    // ====== تحويل النص إلى مصفوفة ======
+    // ========= تحويل النص إلى مصفوفة =========
     function parseMatrix(text) {
       const lines = text
         .split(/\r?\n/)
@@ -327,7 +455,11 @@ c d"></textarea>
       return matrix;
     }
 
-    // ====== ترانزبوز ======
+    function deepCopyMatrix(matrix) {
+      return matrix.map(row => row.slice());
+    }
+
+    // ========= ترانزبوز =========
     function transpose(matrix) {
       const rows = matrix.length;
       const cols = matrix[0].length;
@@ -342,14 +474,115 @@ c d"></textarea>
       return res;
     }
 
-    // ====== إنفيرس بالمصفوفة الرمزية (Gauss–Jordan) ======
+    // ========= محدد (determinant) عبر الحذف الصفّي =========
+    function determinant(matrix) {
+      const n = matrix.length;
+      if (matrix[0].length !== n) {
+        throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
+      }
+
+      const M = deepCopyMatrix(matrix).map(row => row.map(cleanExpr));
+      let det = "1";
+      let sign = 1;
+
+      for (let col = 0; col < n; col++) {
+        // إيجاد Pivot
+        let pivotRow = -1;
+        for (let r = col; r < n; r++) {
+          if (!isZero(M[r][col])) {
+            pivotRow = r;
+            break;
+          }
+        }
+        if (pivotRow === -1) {
+          return "0";
+        }
+
+        if (pivotRow !== col) {
+          const tmp = M[col];
+          M[col] = M[pivotRow];
+          M[pivotRow] = tmp;
+          sign *= -1;
+        }
+
+        const pivotVal = M[col][col];
+        det = mulExpr(det, pivotVal);
+
+        // جعل ما تحت الـ Pivot صفراً
+        for (let i = col + 1; i < n; i++) {
+          if (isZero(M[i][col])) continue;
+          const factor = divExpr(M[i][col], pivotVal);
+          for (let j = col; j < n; j++) {
+            const correction = mulExpr(factor, M[col][j]);
+            M[i][j] = subExpr(M[i][j], correction);
+          }
+        }
+      }
+
+      if (sign === -1) {
+        det = negateExpr(det);
+      }
+      return cleanExpr(det);
+    }
+
+    // ========= رتبة المصفوفة =========
+    function rank(matrix) {
+      const rows = matrix.length;
+      const cols = matrix[0].length;
+      const M = deepCopyMatrix(matrix).map(row => row.map(cleanExpr));
+      let rankVal = 0;
+      let row = 0;
+
+      for (let col = 0; col < cols && row < rows; col++) {
+        // إيجاد Pivot في هذا العمود
+        let pivotRow = -1;
+        for (let r = row; r < rows; r++) {
+          if (!isZero(M[r][col])) {
+            pivotRow = r;
+            break;
+          }
+        }
+        if (pivotRow === -1) continue;
+
+        // تبديل الصفوف
+        if (pivotRow !== row) {
+          const tmp = M[row];
+          M[row] = M[pivotRow];
+          M[pivotRow] = tmp;
+        }
+
+        const pivotVal = M[row][col];
+
+        // توحيد Pivot إلى 1
+        for (let j = col; j < cols; j++) {
+          M[row][j] = divExpr(M[row][j], pivotVal);
+        }
+
+        // جعل بقية العمود = 0
+        for (let i = 0; i < rows; i++) {
+          if (i === row) continue;
+          const factor = M[i][col];
+          if (isZero(factor)) continue;
+          for (let j = col; j < cols; j++) {
+            const correction = mulExpr(factor, M[row][j]);
+            M[i][j] = subExpr(M[i][j], correction);
+          }
+        }
+
+        row++;
+        rankVal++;
+      }
+
+      return rankVal.toString();
+    }
+
+    // ========= إنفيرس (Gauss–Jordan) =========
     function inverse(matrix) {
       const n = matrix.length;
       if (matrix[0].length !== n) {
         throw new Error("الإنفيرس يُحسب فقط للمصفوفات المربّعة (n×n).");
       }
 
-      // نكوّن مصفوفة موسّعة [A | I]
       const M = matrix.map((row, i) => {
         const left = row.map(x => cleanExpr(x));
         const right = Array.from({ length: n }, (_, j) =>
@@ -361,7 +594,6 @@ c d"></textarea>
       const totalCols = 2 * n;
 
       for (let col = 0; col < n; col++) {
-        // نبحث عن Pivot في هذا العمود
         let pivotRow = -1;
         for (let r = col; r < n; r++) {
           if (!isZero(M[r][col])) {
@@ -370,12 +602,9 @@ c d"></textarea>
           }
         }
         if (pivotRow === -1) {
-          throw new Error(
-            "المصفوفة غير قابلة للعكس (يبدو أن المحدّد = 0 تقريبًا أو رمزيًا)."
-          );
+          throw new Error("المصفوفة غير قابلة للعكس (يبدو أن المحدّد = 0).");
         }
 
-        // تبديل الصف الحالي مع صف الـ Pivot
         if (pivotRow !== col) {
           const tmp = M[col];
           M[col] = M[pivotRow];
@@ -384,12 +613,10 @@ c d"></textarea>
 
         const pivotVal = M[col][col];
 
-        // نقسم الصف كله على Pivot ليصبح pivot = 1
         for (let j = 0; j < totalCols; j++) {
           M[col][j] = divExpr(M[col][j], pivotVal);
         }
 
-        // نجعل باقي العناصر في العمود = 0
         for (let i = 0; i < n; i++) {
           if (i === col) continue;
           const factor = M[i][col];
@@ -402,7 +629,6 @@ c d"></textarea>
         }
       }
 
-      // نأخذ النصف الأيمن كمصفوفة الإنفيرس
       const inv = [];
       for (let i = 0; i < n; i++) {
         inv.push(M[i].slice(n, totalCols).map(cleanExpr));
@@ -410,33 +636,180 @@ c d"></textarea>
       return inv;
     }
 
-    // ====== تحويل المصفوفة إلى نص منسّق ======
-    function matrixToString(mat) {
-      return mat
-        .map(row => row.join("\t"))
-        .join("\n");
+    // ========= تبسيط بعامل مشترك عددي (للعناصر الصحيحة فقط) =========
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b !== 0) {
+        const t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
     }
 
-    // ====== ربط الواجهة ======
+    function detectCommonNumericFactor(matrix) {
+      let g = 0;
+      let allInt = true;
+
+      outer: for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+          const s = cleanExpr(matrix[i][j]);
+          if (!isNumeric(s)) {
+            allInt = false;
+            break outer;
+          }
+          const num = Number(s);
+          if (!Number.isInteger(num)) {
+            allInt = false;
+            break outer;
+          }
+          const absVal = Math.abs(num);
+          if (absVal === 0) continue;
+          if (g === 0) g = absVal;
+          else g = gcd(g, absVal);
+        }
+      }
+
+      if (!allInt || g <= 1) return null;
+      return String(g);
+    }
+
+    function simplifyMatrixCommonFactor(matrix) {
+      const factor = detectCommonNumericFactor(matrix);
+      if (!factor) {
+        return { factor: null, matrix };
+      }
+      const simplified = matrix.map(row =>
+        row.map(cell => divExpr(cell, factor))
+      );
+      return { factor, matrix: simplified };
+    }
+
+    // ========= تنسيق المصفوفة بشكل منسّق الأعمدة =========
+    function formatMatrixPretty(mat) {
+      if (!mat || mat.length === 0) return "—";
+      const rows = mat.length;
+      const cols = mat[0].length;
+      const colWidths = new Array(cols).fill(0);
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const s = cleanExpr(mat[i][j]);
+          if (s.length > colWidths[j]) {
+            colWidths[j] = s.length;
+          }
+        }
+      }
+
+      const lines = [];
+      for (let i = 0; i < rows; i++) {
+        const parts = [];
+        for (let j = 0; j < cols; j++) {
+          const s = cleanExpr(mat[i][j]);
+          const pad = colWidths[j] - s.length;
+          parts.push(" ".repeat(pad) + s);
+        }
+        lines.push("  " + parts.join("  "));
+      }
+
+      return "[\n" + lines.join("\n") + "\n]";
+    }
+
+    function renderMatrix(matrix, outputId, factorId, simplifyOn) {
+      const outEl = document.getElementById(outputId);
+      const factorEl = factorId ? document.getElementById(factorId) : null;
+
+      outEl.textContent = "";
+      if (factorEl) factorEl.textContent = "";
+
+      if (!matrix || matrix.length === 0) {
+        outEl.textContent = "—";
+        return;
+      }
+
+      let matToShow = matrix;
+      let factor = null;
+
+      if (simplifyOn) {
+        const simp = simplifyMatrixCommonFactor(matrix);
+        factor = simp.factor;
+        matToShow = simp.matrix;
+      }
+
+      if (factorEl && factor) {
+        factorEl.textContent = "تم تبسيطها بعامل مشترك: " + factor;
+      }
+
+      outEl.textContent = formatMatrixPretty(matToShow);
+
+      // حركة بسيطة عند كل تحديث
+      outEl.classList.remove("flash");
+      void outEl.offsetWidth; // reflow
+      outEl.classList.add("flash");
+    }
+
+    // ========= ربط الواجهة =========
     const inputEl = document.getElementById("matrixInput");
-    const transposeEl = document.getElementById("transposeOutput");
-    const inverseEl = document.getElementById("inverseOutput");
+    const transposeOut = document.getElementById("transposeOutput");
+    const inverseOut = document.getElementById("inverseOutput");
+    const detOut = document.getElementById("detOutput");
+    const rankOut = document.getElementById("rankOutput");
     const errorBox = document.getElementById("errorBox");
+    const simplifyCheckbox = document.getElementById("simplifyCheckbox");
+    const inverseNote = document.getElementById("inverseNote");
+    const transposeFactorEl = document.getElementById("transposeFactor");
+    const inverseFactorEl = document.getElementById("inverseFactor");
 
     document.getElementById("computeBtn").addEventListener("click", () => {
       errorBox.style.display = "none";
       errorBox.textContent = "";
-      transposeEl.value = "";
-      inverseEl.value = "";
+
+      detOut.textContent = "—";
+      rankOut.textContent = "—";
+      transposeOut.textContent = "";
+      inverseOut.textContent = "";
+      inverseNote.textContent = "";
+      transposeFactorEl.textContent = "";
+      inverseFactorEl.textContent = "";
 
       try {
         const text = inputEl.value;
         const A = parseMatrix(text);
-        const AT = transpose(A);
-        const Ainverse = inverse(A);
+        const simplifyOn = simplifyCheckbox.checked;
 
-        transposeEl.value = matrixToString(AT);
-        inverseEl.value = matrixToString(Ainverse);
+        // ترانزبوز
+        const AT = transpose(A);
+        renderMatrix(AT, "transposeOutput", "transposeFactor", simplifyOn);
+
+        // رتبة (لكل المصفوفات)
+        const rnk = rank(A);
+        rankOut.textContent = rnk;
+
+        // محدد وإنفيرس (فقط لو مربعة)
+        if (A.length === A[0].length) {
+          const detVal = determinant(A);
+          detOut.textContent = detVal || "0";
+
+          try {
+            const invMat = inverse(A);
+            inverseNote.textContent = "";
+            renderMatrix(invMat, "inverseOutput", "inverseFactor", simplifyOn);
+          } catch (eInv) {
+            inverseFactorEl.textContent = "";
+            inverseOut.textContent =
+              "لا يمكن إيجاد الإنفيرس لهذه المصفوفة.\n" +
+              (eInv.message || "");
+            inverseNote.textContent =
+              "غالبًا المحدّد يساوي صفر أو أن A مفردة.";
+          }
+        } else {
+          detOut.textContent = "غير معرّف للمصفوفة غير المربّعة.";
+          inverseOut.textContent =
+            "الإنفيرس يُعرّف فقط للمصفوفات المربّعة (n×n).";
+          inverseNote.textContent =
+            "يمكنك مع ذلك استخدام الترانزبوز والرتبة لهذه المصفوفة.";
+        }
       } catch (err) {
         errorBox.textContent = err.message || String(err);
         errorBox.style.display = "block";
