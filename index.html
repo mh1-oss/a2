@@ -120,6 +120,12 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 1px var(--accent-soft);
     }
+    /* إدخال المصفوفات LTR حتى ما تنقلب الأرقام */
+    .matrix-input {
+      direction: ltr;
+      text-align: left;
+    }
+
     .hint {
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -221,6 +227,8 @@
     .metric-value {
       font-size: 0.9rem;
       word-wrap: break-word;
+      direction: ltr;
+      text-align: left;
     }
 
     .results-grid {
@@ -243,7 +251,7 @@
       gap: 8px;
     }
 
-    /* Matrix box using table (أوضح بكثير) */
+    /* Matrix box using table */
     .matrix-box {
       margin-top: 4px;
       border-radius: 10px;
@@ -252,6 +260,7 @@
       padding: 6px;
       max-height: 260px;
       overflow: auto;
+      direction: ltr; /* عرض المصفوفة من اليسار لليمين */
     }
     .matrix-table {
       border-collapse: collapse;
@@ -266,6 +275,23 @@
       font-family: "JetBrains Mono", Consolas, monospace;
       font-size: 0.8rem;
       word-break: break-all;
+      direction: ltr;
+    }
+
+    /* Fraction styling */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+    }
+    .frac-num, .frac-den {
+      padding: 0 2px;
+    }
+    .frac-line {
+      width: 100%;
+      border-top: 1px solid currentColor;
+      margin: 1px 0;
     }
 
     @keyframes flashBox {
@@ -371,7 +397,7 @@
   <div class="app">
     <h1>مجموعة أدوات المصفوفات</h1>
     <div class="subtitle">
-      تبويب واحد لـ <strong>تحليل المصفوفة</strong> وآخر لـ <strong>عمليات المصفوفات وحل Ax = b</strong>.
+      تبويب لـ <strong>تحليل مصفوفة</strong> وآخر لـ <strong>عمليات المصفوفات وحل Ax = b</strong>.
     </div>
 
     <div class="tabs-wrapper">
@@ -385,7 +411,7 @@
     <section id="tab-analysis" class="tab-content active">
       <div class="card">
         <label for="matrixInputMain">المصفوفة A (كل صف بسطر، والعناصر بمسافة أو فاصلة):</label>
-        <textarea id="matrixInputMain" placeholder="أمثلة:
+        <textarea id="matrixInputMain" class="matrix-input" placeholder="أمثلة:
 
 1 2
 3 4
@@ -398,7 +424,8 @@ c d
 5, 6, 0"></textarea>
         <div class="hint">
           ▪ الترانزبوز والرتبة يعملان لأي مصفوفة<br>
-          ▪ المحدد والإنفيرس فقط للمصفوفات المربعة (n×n)
+          ▪ المحدد والإنفيرس فقط للمصفوفات المربعة (n×n)<br>
+          ▪ يمكنك استخدام أسس مثل L^2 أو x^3
         </div>
 
         <div class="checkbox-line">
@@ -409,7 +436,7 @@ c d
         <div class="btn-row">
           <button id="computeMainBtn">⚙️ احسب Aᵀ و A⁻¹ و det و rank</button>
           <button id="exampleMainNumBtn" class="btn-secondary">📌 مثال عددي ٣×٣</button>
-          <button id="exampleMainVarBtn" class="btn-secondary">📌 مثال مع متغيرات ٢×٢</button>
+          <button id="exampleMainVarBtn" class="btn-secondary">📌 مثال مع متغيرات</button>
         </div>
 
         <div id="errorMain" class="error"></div>
@@ -428,6 +455,15 @@ c d
         </div>
 
         <div class="results-grid">
+          <!-- عرض المصفوفة A نفسها -->
+          <div class="result-block">
+            <div class="result-label">
+              <span>A (بعد التفسير):</span>
+            </div>
+            <div class="factor-line" id="mainMatrixFactor"></div>
+            <div id="mainMatrixBox" class="matrix-box"></div>
+          </div>
+
           <div class="result-block">
             <div class="result-label">
               <span>الترانزبوز (Aᵀ):</span>
@@ -448,7 +484,8 @@ c d
         </div>
 
         <div class="hint" style="margin-top:8px;">
-          النتائج تُعرض في جدول بحدود واضحة؛ كل عنصر داخل خلية مستقلة حتى لو كان طويل وفيه متغيرات.
+          النتائج تُعرض في جدول بحدود واضحة؛ الكسور تظهر بخط كسر (بسط / خط / مقام)،  
+          والأسس تظهر كتربيع/تكعيب (مثل L², L³) بدل تكرار الضرب.
         </div>
       </div>
     </section>
@@ -459,15 +496,15 @@ c d
         <div class="grid-2">
           <div>
             <label for="matrixA">المصفوفة A:</label>
-            <textarea id="matrixA" placeholder="مثال:
+            <textarea id="matrixA" class="matrix-input" placeholder="مثال:
 
 1 2
 3 4"></textarea>
-            <div class="hint">كل صف بسطر، العناصر بمسافة أو فاصلة.</div>
+            <div class="hint">كل صف بسطر، العناصر بمسافة أو فاصلة. يدعم رموز وأسس مثل x^2.</div>
           </div>
           <div>
             <label for="matrixB">المصفوفة B (للجمع/الطرح/الضرب):</label>
-            <textarea id="matrixB" placeholder="مثال:
+            <textarea id="matrixB" class="matrix-input" placeholder="مثال:
 
 5 6
 7 8"></textarea>
@@ -480,7 +517,7 @@ c d
 
         <div style="margin-top:12px;">
           <label for="vectorB">المتجه b في المعادلة Ax = b (عمودي):</label>
-          <textarea id="vectorB" placeholder="مثال b:
+          <textarea id="vectorB" class="matrix-input" placeholder="مثال b:
 
 5
 11"></textarea>
@@ -516,7 +553,7 @@ c d
     </section>
 
     <div class="footer">
-      التبسيط الرمزي هنا بسيط (عامل مشترك فقط). للتعابير الرمزية الثقيلة جدًا مثل برامج CAS المتخصّصة ممكن تحتاج أدوات أعمق.
+      التبسيط الرمزي هنا يدعم الضرب/الجمع/الكسور والأسس الصحيحة البسيطة. للحالات الرمزية الثقيلة جدًا تحتاج CAS متخصّص.
     </div>
   </div>
 
@@ -532,7 +569,7 @@ c d
   </div>
 
   <script>
-    // ========= تعابير رمزية بسيطة =========
+    // ========= أدوات أساسية =========
     function cleanExpr(x) {
       return (x ?? "").toString().trim();
     }
@@ -583,6 +620,373 @@ c d
       return "(" + a + ")/(" + b + ")";
     }
 
+    function gcd(a, b) {
+      a = Math.abs(a);
+      b = Math.abs(b);
+      while (b !== 0) {
+        const t = b;
+        b = a % b;
+        a = t;
+      }
+      return a;
+    }
+
+    // ========= دعم الأسس في النص (مثل L^3) بتحويلها لضرب مكرر =========
+    function expandPowers(str) {
+      let s = str;
+      const re = /([A-Za-z][A-Za-z0-9_]*)\^(\d+)/g;
+      s = s.replace(re, (match, base, expStr) => {
+        const e = parseInt(expStr, 10);
+        if (!Number.isFinite(e) || e < 0 || e > 9) return match;
+        if (e === 0) return "1";
+        if (e === 1) return base;
+        let rep = base;
+        for (let i = 1; i < e; i++) rep = rep + "*" + base;
+        return "(" + rep + ")";
+      });
+      return s;
+    }
+
+    // ========= Tokenizer / Parser للتبسيط الرمزي =========
+    function tokenizeExpression(str) {
+      const s = str.trim();
+      const tokens = [];
+      let i = 0;
+      while (i < s.length) {
+        const ch = s[i];
+        if (/\s/.test(ch)) {
+          i++;
+          continue;
+        }
+        if ("+-*/()".includes(ch)) {
+          tokens.push({ type: "op", value: ch });
+          i++;
+          continue;
+        }
+        if (/[0-9]/.test(ch)) {
+          let j = i;
+          while (j < s.length && /[0-9]/.test(s[j])) j++;
+          if (j < s.length && s[j] === ".") {
+            j++;
+            while (j < s.length && /[0-9]/.test(s[j])) j++;
+          }
+          const numStr = s.slice(i, j);
+          tokens.push({ type: "num", value: numStr });
+          i = j;
+          continue;
+        }
+        if (/[A-Za-z_]/.test(ch)) {
+          let j = i;
+          while (j < s.length && /[A-Za-z0-9_]/.test(s[j])) j++;
+          const idStr = s.slice(i, j);
+          tokens.push({ type: "id", value: idStr });
+          i = j;
+          continue;
+        }
+        // رمز غير مدعوم ⇒ نرجّع null ونوقف التبسيط
+        return null;
+      }
+      return tokens;
+    }
+
+    function parseExpressionTokens(tokens) {
+      if (!tokens || tokens.length === 0) throw new Error("تعبير فارغ.");
+
+      let pos = 0;
+      function peek() { return tokens[pos]; }
+      function consume() { return tokens[pos++]; }
+
+      function makeAdd(a, b) {
+        if (a.type === "add") {
+          const terms = a.terms.slice();
+          if (b.type === "add") terms.push(...b.terms);
+          else terms.push(b);
+          return { type: "add", terms };
+        } else {
+          if (b.type === "add") return { type: "add", terms: [a, ...b.terms] };
+          return { type: "add", terms: [a, b] };
+        }
+      }
+      function makeMul(a, b) {
+        const factors = [];
+        if (a.type === "mul") factors.push(...a.factors); else factors.push(a);
+        if (b.type === "mul") factors.push(...b.factors); else factors.push(b);
+        return { type: "mul", factors };
+      }
+
+      function parsePrimary() {
+        const t = peek();
+        if (!t) throw new Error("نهاية غير متوقعة للتعبير.");
+        if (t.type === "op" && t.value === "-") {
+          consume();
+          const inner = parsePrimary();
+          return makeMul({ type: "num", value: -1 }, inner);
+        }
+        if (t.type === "num") {
+          consume();
+          return { type: "num", value: Number(t.value) };
+        }
+        if (t.type === "id") {
+          consume();
+          return { type: "sym", name: t.value };
+        }
+        if (t.type === "op" && t.value === "(") {
+          consume();
+          const node = parseExpr();
+          const t2 = peek();
+          if (!t2 || t2.type !== "op" || t2.value !== ")") {
+            throw new Error("قوس إغلاق مفقود ).");
+          }
+          consume();
+          return node;
+        }
+        throw new Error("رمز غير متوقع في التعبير.");
+      }
+
+      function parseFactor() {
+        let node = parsePrimary();
+        // (لا ندعم ^ هنا لأننا وسعناه مسبقاً إلى ضرب مكرّر expandPowers)
+        return node;
+      }
+
+      function parseTerm() {
+        let node = parseFactor();
+        while (true) {
+          const t = peek();
+          if (!t || t.type !== "op" || (t.value !== "*" && t.value !== "/")) break;
+          const op = consume().value;
+          const right = parseFactor();
+          if (op === "*") node = makeMul(node, right);
+          else node = { type: "div", num: node, den: right };
+        }
+        return node;
+      }
+
+      function parseExpr() {
+        let node = parseTerm();
+        while (true) {
+          const t = peek();
+          if (!t || t.type !== "op" || (t.value !== "+" && t.value !== "-")) break;
+          const op = consume().value;
+          const right = parseTerm();
+          if (op === "+") node = makeAdd(node, right);
+          else {
+            const negRight = makeMul({ type: "num", value: -1 }, right);
+            node = makeAdd(node, negRight);
+          }
+        }
+        return node;
+      }
+
+      const node = parseExpr();
+      if (pos !== tokens.length) throw new Error("لم يتم تحليل كل التعبير.");
+      return node;
+    }
+
+    function makeMono(num, den, vars) {
+      return { num: num, den: den, vars: { ...vars } };
+    }
+
+    function multiplyMonomial(a, b) {
+      const vars = {};
+      for (const k in a.vars) vars[k] = a.vars[k];
+      for (const k in b.vars) {
+        vars[k] = (vars[k] || 0) + b.vars[k];
+      }
+      let num = a.num * b.num;
+      let den = a.den * b.den;
+      if (!Number.isFinite(num) || !Number.isFinite(den)) return null;
+      if (den === 0) return null;
+      const g = gcd(Math.abs(num), Math.abs(den));
+      num /= g; den /= g;
+      if (den < 0) { den *= -1; num *= -1; }
+      return makeMono(num, den, vars);
+    }
+
+    function multiplyMonomialLists(list1, list2) {
+      const res = [];
+      for (const m1 of list1) {
+        for (const m2 of list2) {
+          const m = multiplyMonomial(m1, m2);
+          if (!m) return null;
+          res.push(m);
+        }
+      }
+      return res;
+    }
+
+    function varsKey(vars) {
+      const keys = Object.keys(vars).sort();
+      if (!keys.length) return "";
+      return keys.map(k => k + "^" + vars[k]).join("*");
+    }
+
+    function combineLikeTerms(list) {
+      const map = new Map();
+      for (const m of list) {
+        if (m.num === 0) continue;
+        const key = varsKey(m.vars);
+        if (!map.has(key)) {
+          map.set(key, { num: m.num, den: m.den, vars: { ...m.vars } });
+        } else {
+          const cur = map.get(key);
+          const d1 = cur.den;
+          const d2 = m.den;
+          const g1 = gcd(d1, d2);
+          const lcm = (d1 / g1) * d2;
+          const num = cur.num * (lcm / d1) + m.num * (lcm / d2);
+          if (num === 0) {
+            map.set(key, { num: 0, den: 1, vars: {} });
+          } else {
+            const g2 = gcd(Math.abs(num), lcm);
+            const nn = num / g2;
+            const dd = lcm / g2;
+            map.set(key, { num: nn, den: dd, vars: { ...cur.vars } });
+          }
+        }
+      }
+      const res = [];
+      for (const m of map.values()) {
+        if (m.num !== 0) res.push(m);
+      }
+      return res;
+    }
+
+    function divideMonomialListByMonomial(list, dmon) {
+      if (dmon.num === 0) return null;
+      // لا ندعم متغيرات في المقام (مثل 1/L) في هذا المبسّط
+      if (Object.keys(dmon.vars).length > 0) return null;
+      const res = [];
+      for (const m of list) {
+        let num = m.num * dmon.den;
+        let den = m.den * dmon.num;
+        if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return null;
+        const vars = { ...m.vars };
+        const g = gcd(Math.abs(num), Math.abs(den));
+        num /= g; den /= g;
+        if (den < 0) { den *= -1; num *= -1; }
+        res.push(makeMono(num, den, vars));
+      }
+      return res;
+    }
+
+    function toSuperscript(n) {
+      const map = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹" };
+      const s = String(n);
+      let out = "";
+      for (const ch of s) out += map[ch] || ch;
+      return out;
+    }
+
+    function buildVarsStr(vars) {
+      const keys = Object.keys(vars).sort();
+      if (!keys.length) return "";
+      const parts = [];
+      for (const k of keys) {
+        const e = vars[k];
+        if (e === 1) parts.push(k);
+        else parts.push(k + toSuperscript(e));
+      }
+      return parts.join("*");
+    }
+
+    function monomialCoreString(nAbs, den, varsStr) {
+      if (den === 1) {
+        if (varsStr) {
+          if (nAbs === 1) return varsStr;
+          return nAbs + "*" + varsStr;
+        } else {
+          return String(nAbs);
+        }
+      } else {
+        if (varsStr) {
+          const numExpr = (nAbs === 1) ? varsStr : (nAbs + "*" + varsStr);
+          return "(" + numExpr + ")/" + den;
+        } else {
+          return nAbs + "/" + den;
+        }
+      }
+    }
+
+    function monomialsToString(list) {
+      if (!list || list.length === 0) return "0";
+      let res = "";
+      for (let i = 0; i < list.length; i++) {
+        const m = list[i];
+        const sign = m.num < 0 ? -1 : 1;
+        const nAbs = Math.abs(m.num);
+        const den = m.den;
+        const varsStr = buildVarsStr(m.vars);
+        const core = monomialCoreString(nAbs, den, varsStr);
+        if (i === 0) {
+          if (sign < 0) res += "-" + core;
+          else res += core;
+        } else {
+          if (sign < 0) res += " - " + core;
+          else res += " + " + core;
+        }
+      }
+      return res;
+    }
+
+    function canonicalizeNode(node) {
+      switch (node.type) {
+        case "num":
+          if (!Number.isFinite(node.value)) return null;
+          if (!Number.isInteger(node.value)) return null;
+          return [makeMono(node.value, 1, {})];
+        case "sym":
+          return [makeMono(1, 1, { [node.name]: 1 })];
+        case "add": {
+          let res = [];
+          for (const t of node.terms) {
+            const sub = canonicalizeNode(t);
+            if (!sub) return null;
+            res = res.concat(sub);
+          }
+          return res;
+        }
+        case "mul": {
+          if (!node.factors.length) return [makeMono(1, 1, {})];
+          let acc = [makeMono(1, 1, {})];
+          for (const f of node.factors) {
+            const sub = canonicalizeNode(f);
+            if (!sub) return null;
+            acc = multiplyMonomialLists(acc, sub);
+            if (!acc) return null;
+          }
+          return acc;
+        }
+        case "div": {
+          const numList = canonicalizeNode(node.num);
+          const denList = canonicalizeNode(node.den);
+          if (!numList || !denList) return null;
+          if (denList.length !== 1) return null;
+          const dmon = denList[0];
+          return divideMonomialListByMonomial(numList, dmon);
+        }
+        default:
+          return null;
+      }
+    }
+
+    function simplifyExprFull(exprStr) {
+      const raw0 = cleanExpr(exprStr);
+      if (!raw0) return raw0;
+      try {
+        const raw = expandPowers(raw0);
+        const tokens = tokenizeExpression(raw);
+        if (!tokens) return raw0;
+        const ast = parseExpressionTokens(tokens);
+        const monos = canonicalizeNode(ast);
+        if (!monos) return raw0;
+        const combined = combineLikeTerms(monos);
+        return monomialsToString(combined);
+      } catch (e) {
+        return raw0;
+      }
+    }
+
     // ========= مصفوفات: قراءة ونسخ =========
     function parseMatrix(text) {
       const lines = text
@@ -613,8 +1017,16 @@ c d
     function deepCopyMatrix(mat) {
       return mat.map(r => r.slice());
     }
+    function hasSymbolic(matrix) {
+      for (const row of matrix) {
+        for (const cell of row) {
+          if (!isNumeric(cell)) return true;
+        }
+      }
+      return false;
+    }
 
-    // ========= عمليات أساسية: ترانزبوز، محدد، رتبة، إنفيرس =========
+    // ========= ترانزبوز =========
     function transpose(matrix) {
       const rows = matrix.length;
       const cols = matrix[0].length;
@@ -627,18 +1039,46 @@ c d
       return res;
     }
 
-    function determinant(matrix) {
-      const n = matrix.length;
-      if (matrix[0].length !== n) {
-        throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
+    // ========= محدد =========
+    function determinantSmallSymbolic(A) {
+      const n = A.length;
+      if (A[0].length !== n) throw new Error("A ليست مربّعة.");
+      if (n === 1) {
+        return cleanExpr(A[0][0]);
       }
-      const M = deepCopyMatrix(matrix).map(row => row.map(cleanExpr));
-      let det = "1";
+      if (n === 2) {
+        const a = A[0][0], b = A[0][1], c = A[1][0], d = A[1][1];
+        return subExpr(mulExpr(a, d), mulExpr(b, c)); // ad - bc
+      }
+      if (n === 3) {
+        const a = A[0][0], b = A[0][1], c = A[0][2];
+        const d = A[1][0], e = A[1][1], f = A[1][2];
+        const g = A[2][0], h = A[2][1], i = A[2][2];
+
+        const term1 = mulExpr(a, mulExpr(e, i));
+        const term2 = mulExpr(b, mulExpr(f, g));
+        const term3 = mulExpr(c, mulExpr(d, h));
+        const pos = addExpr(term1, addExpr(term2, term3));
+
+        const term4 = mulExpr(c, mulExpr(e, g));
+        const term5 = mulExpr(b, mulExpr(d, i));
+        const term6 = mulExpr(a, mulExpr(f, h));
+        const neg = addExpr(term4, addExpr(term5, term6));
+
+        return subExpr(pos, neg);
+      }
+      throw new Error("المحدد الرمزي مدعوم فقط لمصفوفات ١×١ و٢×٢ و٣×٣.");
+    }
+
+    function determinantNumeric(A) {
+      const n = A.length;
+      const M = A.map(row => row.map(x => Number(x)));
+      let det = 1;
       let sign = 1;
       for (let col = 0; col < n; col++) {
         let pivotRow = -1;
         for (let r = col; r < n; r++) {
-          if (!isZero(M[r][col])) { pivotRow = r; break; }
+          if (Math.abs(M[r][col]) > 1e-12) { pivotRow = r; break; }
         }
         if (pivotRow === -1) return "0";
         if (pivotRow !== col) {
@@ -646,20 +1086,34 @@ c d
           sign *= -1;
         }
         const pivotVal = M[col][col];
-        det = mulExpr(det, pivotVal);
+        det *= pivotVal;
         for (let i = col + 1; i < n; i++) {
-          if (isZero(M[i][col])) continue;
-          const factor = divExpr(M[i][col], pivotVal);
+          const factor = M[i][col] / pivotVal;
           for (let j = col; j < n; j++) {
-            const corr = mulExpr(factor, M[col][j]);
-            M[i][j] = subExpr(M[i][j], corr);
+            M[i][j] -= factor * M[col][j];
           }
         }
       }
-      if (sign === -1) det = negateExpr(det);
-      return cleanExpr(det);
+      return String(det * sign);
     }
 
+    function determinant(matrix) {
+      const n = matrix.length;
+      if (matrix[0].length !== n) {
+        throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
+      }
+      const symbolic = hasSymbolic(matrix);
+      if (symbolic) {
+        if (n <= 3) {
+          const raw = determinantSmallSymbolic(matrix);
+          return simplifyExprFull(raw);
+        }
+        throw new Error("حساب المحدد الرمزي لمصفوفة أكبر من ٣×٣ غير مدعوم حاليًا. استخدم قيم عددية أو مصفوفة أصغر.");
+      }
+      return determinantNumeric(matrix);
+    }
+
+    // ========= رتبة =========
     function rank(matrix) {
       const rows = matrix.length;
       const cols = matrix[0].length;
@@ -694,11 +1148,27 @@ c d
       return rankVal.toString();
     }
 
+    // ========= إنفيرس =========
     function inverse(matrix) {
       const n = matrix.length;
       if (matrix[0].length !== n) {
         throw new Error("الإنفيرس يُحسب فقط للمصفوفات المربّعة (n×n).");
       }
+
+      const symbolic = hasSymbolic(matrix);
+      if (symbolic && n === 2) {
+        const a = matrix[0][0], b = matrix[0][1], c = matrix[1][0], d = matrix[1][1];
+        const detA = determinantSmallSymbolic(matrix);
+        const detS = simplifyExprFull(detA);
+        if (isZero(detS)) {
+          throw new Error("المصفوفة غير قابلة للعكس (det(A) = 0 رمزيًا أو عدديًا).");
+        }
+        return [
+          [divExpr(d, detS), divExpr(negateExpr(b), detS)],
+          [divExpr(negateExpr(c), detS), divExpr(a, detS)]
+        ];
+      }
+
       const M = matrix.map((row, i) => {
         const left = row.map(x => cleanExpr(x));
         const right = Array.from({ length: n }, (_, j) => (i === j ? "1" : "0"));
@@ -711,7 +1181,7 @@ c d
           if (!isZero(M[r][col])) { pivotRow = r; break; }
         }
         if (pivotRow === -1) {
-          throw new Error("المصفوفة غير قابلة للعكس (يبدو أن المحدّد = 0).");
+          throw new Error("المصفوفة غير قابلة للعكس (det(A) = 0 تقريبًا).");
         }
         if (pivotRow !== col) {
           const tmp = M[col]; M[col] = M[pivotRow]; M[pivotRow] = tmp;
@@ -737,43 +1207,26 @@ c d
       return inv;
     }
 
-    // ========= GCD & عامل مشترك رمزي بسيط =========
-    function gcd(a, b) {
-      a = Math.abs(a);
-      b = Math.abs(b);
-      while (b !== 0) {
-        const t = b;
-        b = a % b;
-        a = t;
-      }
-      return a;
-    }
-
-    // يقبل:
-    // 2, -3, 2a, 2*a, (2)*a, (2)*(a), a, -a, (a), ( -a )
+    // ========= عامل مشترك رمزي بسيط =========
     function extractCoeffAndSymbol(str) {
       const s = cleanExpr(str);
       if (s === "" || s === "0") return { coeff: 0, symbol: "" };
 
-      // pure integer
       if (/^[+-]?\d+$/.test(s)) {
         return { coeff: parseInt(s, 10), symbol: "" };
       }
 
-      // (2)*(a) أو 2*a أو 2a
       let m = s.match(/^\(?([+-]?\d+)\)?\*?\(?([a-zA-Z][\w]*)\)?$/);
       if (m) {
         return { coeff: parseInt(m[1], 10), symbol: m[2] };
       }
 
-      // (a) أو a أو -a
       m = s.match(/^\(?([+-]?)([a-zA-Z][\w]*)\)?$/);
       if (m) {
         const sign = m[1] === "-" ? -1 : 1;
         return { coeff: sign, symbol: m[2] };
       }
 
-      // تعبير أعقد: لا نتدخل به
       return null;
     }
 
@@ -792,7 +1245,7 @@ c d
           const absVal = Math.abs(coeff);
           if (absVal === 0) continue;
           if (commonSymbol === null) {
-            commonSymbol = symbol; // ممكن ""
+            commonSymbol = symbol;
           } else if (commonSymbol !== symbol) {
             compatible = false;
             break outer;
@@ -827,10 +1280,9 @@ c d
           const s = cleanExpr(cell);
           if (s === "" || s === "0") return "0";
           const parsed = extractCoeffAndSymbol(s);
-          if (!parsed) return s; // إذا تعبير أعقد، نخليه كما هو
+          if (!parsed) return s;
           let { coeff: c, symbol: sym } = parsed;
           const newCoeff = c / coeff;
-
           if (!sym) {
             return String(newCoeff);
           }
@@ -842,11 +1294,48 @@ c d
           return s;
         })
       );
-
       return { factor: factorStr, matrix: simplified };
     }
 
-    // ========= عرض المصفوفة في جدول واضح =========
+    // ========= عرض تعبير داخل خلية (مع تبسيط + خط كسر) =========
+    function renderExprToCell(td, expr) {
+      const simplified = simplifyExprFull(expr);
+      const s = cleanExpr(simplified);
+
+      if (!s.includes("/")) {
+        td.textContent = s || "0";
+        return;
+      }
+
+      const parts = s.split("/");
+      if (parts.length === 2) {
+        let num = parts[0].replace(/^\((.*)\)$/, "$1");
+        let den = parts[1].replace(/^\((.*)\)$/, "$1");
+
+        const frac = document.createElement("span");
+        frac.className = "frac";
+
+        const numSpan = document.createElement("span");
+        numSpan.className = "frac-num";
+        numSpan.textContent = num;
+
+        const lineSpan = document.createElement("span");
+        lineSpan.className = "frac-line";
+
+        const denSpan = document.createElement("span");
+        denSpan.className = "frac-den";
+        denSpan.textContent = den;
+
+        frac.appendChild(numSpan);
+        frac.appendChild(lineSpan);
+        frac.appendChild(denSpan);
+        td.appendChild(frac);
+      } else {
+        td.textContent = s;
+      }
+    }
+
+    // ========= عرض مصفوفة =========
     function renderMatrix(matrix, boxId, factorId, simplifyOn) {
       const box = document.getElementById(boxId);
       const factorEl = factorId ? document.getElementById(factorId) : null;
@@ -884,7 +1373,7 @@ c d
         const tr = document.createElement("tr");
         for (const cell of row) {
           const td = document.createElement("td");
-          td.textContent = cleanExpr(cell) || "0";
+          renderExprToCell(td, cell);
           tr.appendChild(td);
         }
         tbody.appendChild(tr);
@@ -897,7 +1386,7 @@ c d
       box.classList.add("flash");
     }
 
-    // ========= عمليات للمصفوفات في تبويب العمليات =========
+    // ========= عمليات للمصفوفات (تبويب العمليات) =========
     function addMatrices(A, B) {
       if (A.length !== B.length || A[0].length !== B[0].length) {
         throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
@@ -952,7 +1441,7 @@ c d
       return lines.join("\n");
     }
 
-    // ========= Tabs switching =========
+    // ========= Tabs =========
     const tabButtons = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
     tabButtons.forEach(btn => {
@@ -965,7 +1454,7 @@ c d
       });
     });
 
-    // ========= ربط تبويب تحليل المصفوفة =========
+    // ========= تبويب تحليل المصفوفة =========
     const matrixInputMain = document.getElementById("matrixInputMain");
     const simplifyMain = document.getElementById("simplifyMain");
     const detMain = document.getElementById("detMain");
@@ -983,20 +1472,28 @@ c d
       document.getElementById("inverseBoxMain").innerHTML = "";
       document.getElementById("transposeFactorMain").textContent = "";
       document.getElementById("inverseFactorMain").textContent = "";
+      document.getElementById("mainMatrixBox").innerHTML = "";
+      document.getElementById("mainMatrixFactor").textContent = "";
 
       try {
         const A = parseMatrix(matrixInputMain.value);
         const simplifyOn = simplifyMain.checked;
 
+        // عرض A نفسها
+        renderMatrix(A, "mainMatrixBox", "mainMatrixFactor", simplifyOn);
+
+        // الترانزبوز
         const AT = transpose(A);
         renderMatrix(AT, "transposeBoxMain", "transposeFactorMain", simplifyOn);
 
+        // الرتبة
         const rnk = rank(A);
         rankMain.textContent = rnk;
 
         if (A.length === A[0].length) {
           const detVal = determinant(A);
-          detMain.textContent = detVal || "0";
+          detMain.textContent = simplifyExprFull(detVal) || "0";
+
           try {
             const invMat = inverse(A);
             renderMatrix(invMat, "inverseBoxMain", "inverseFactorMain", simplifyOn);
@@ -1024,7 +1521,7 @@ c d
       matrixInputMain.value = "1 2 3\n0 1 4\n5 6 0";
     });
     document.getElementById("exampleMainVarBtn").addEventListener("click", () => {
-      matrixInputMain.value = "a b\nc d";
+      matrixInputMain.value = "L/2 0\n0 L^2/4";
     });
 
     // ========= Overlay للإنفيرس بالحجم الكامل =========
@@ -1085,7 +1582,7 @@ c d
         const tr = document.createElement("tr");
         for (const cell of row) {
           const td = document.createElement("td");
-          td.textContent = cleanExpr(cell) || "0";
+          renderExprToCell(td, cell);
           tr.appendChild(td);
         }
         tbody.appendChild(tr);
