@@ -303,9 +303,11 @@
     }
 
     .factor-line {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: #a5b4fc;
-      min-height: 1em;
+      min-height: 1.2em;
+      margin-bottom: 2px;
+      font-family: "JetBrains Mono", Consolas, monospace;
     }
     .small-note {
       margin-top: 3px;
@@ -407,7 +409,6 @@
       </div>
     </div>
 
-    <!-- تبويب 1: تحليل مصفوفة -->
     <section id="tab-analysis" class="tab-content active">
       <div class="card">
         <label for="matrixInputMain">المصفوفة A (كل صف بسطر، والعناصر بمسافة أو فاصلة):</label>
@@ -429,8 +430,8 @@ c d
         </div>
 
         <div class="checkbox-line">
-          <input type="checkbox" id="simplifyMain" />
-          <span>تبسيط بعامل مشترك عددي/رمزي بسيط إن أمكن</span>
+          <input type="checkbox" id="simplifyMain" checked />
+          <span>تبسيط وعزل (1/det) كعامل مشترك في الإنفيرس</span>
         </div>
 
         <div class="btn-row">
@@ -455,7 +456,6 @@ c d
         </div>
 
         <div class="results-grid">
-          <!-- عرض المصفوفة A نفسها -->
           <div class="result-block">
             <div class="result-label">
               <span>A (بعد التفسير):</span>
@@ -484,13 +484,12 @@ c d
         </div>
 
         <div class="hint" style="margin-top:8px;">
-          النتائج تُعرض في جدول بحدود واضحة؛ الكسور تظهر بخط كسر (بسط / خط / مقام)،  
-          والأسس تظهر كتربيع/تكعيب (مثل L², L³) بدل تكرار الضرب.
+          النتائج تُعرض في جدول بحدود واضحة؛ الكسور تظهر بخط كسر،  
+          وعند تفعيل التبسيط يتم عزل المحدد خارج المصفوفة لتسهيل القراءة.
         </div>
       </div>
     </section>
 
-    <!-- تبويب 2: عمليات على المصفوفات -->
     <section id="tab-ops" class="tab-content">
       <div class="card">
         <div class="grid-2">
@@ -553,15 +552,17 @@ c d
     </section>
 
     <div class="footer">
-      التبسيط الرمزي هنا يدعم الضرب/الجمع/الكسور والأسس الصحيحة البسيطة. للحالات الرمزية الثقيلة جدًا تحتاج CAS متخصّص.
+      تم تطوير هذا النموذج بواسطة المهندس محمد مصطفى
     </div>
   </div>
 
-  <!-- Overlay عرض إنفيرس بالحجم الكامل -->
   <div id="inverseOverlay" class="overlay">
     <div class="overlay-content">
       <div class="overlay-header">
-        <span>الإنفيرس (A⁻¹) - عرض كامل</span>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+           <span>الإنفيرس (A⁻¹) - عرض كامل</span>
+           <span id="overlayFactorLine" class="factor-line" style="font-size:0.85rem;"></span>
+        </div>
         <button id="closeOverlayBtn" class="btn-secondary overlay-close">✕ إغلاق</button>
       </div>
       <div id="inverseOverlayBox" class="matrix-box overlay-matrix"></div>
@@ -630,7 +631,53 @@ c d
       }
       return a;
     }
+// ========= عمليات المصفوفات المفقودة (أضفها هنا) =========
 
+    function addMatrices(A, B) {
+      if (A.length !== B.length || A[0].length !== B[0].length) {
+        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
+      }
+      const m = A.length, n = A[0].length;
+      const C = Array.from({ length: m }, () => Array(n).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          C[i][j] = addExpr(A[i][j], B[i][j]);
+        }
+      }
+      return C;
+    }
+
+    function subMatrices(A, B) {
+      if (A.length !== B.length || A[0].length !== B[0].length) {
+        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
+      }
+      const m = A.length, n = A[0].length;
+      const C = Array.from({ length: m }, () => Array(n).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          C[i][j] = subExpr(A[i][j], B[i][j]);
+        }
+      }
+      return C;
+    }
+
+    function mulMatrices(A, B) {
+      const m = A.length, n = A[0].length, p = B[0].length;
+      if (B.length !== n) {
+        throw new Error("لـ A×B: عدد أعمدة A يجب أن يساوي عدد صفوف B.");
+      }
+      const C = Array.from({ length: m }, () => Array(p).fill("0"));
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < p; j++) {
+          let sum = "0";
+          for (let k = 0; k < n; k++) {
+            sum = addExpr(sum, mulExpr(A[i][k], B[k][j]));
+          }
+          C[i][j] = sum;
+        }
+      }
+      return C;
+    }
     // ========= دعم الأسس في النص (مثل L^3) بتحويلها لضرب مكرر =========
     function expandPowers(str) {
       let s = str;
@@ -1039,35 +1086,81 @@ c d
       return res;
     }
 
-    // ========= محدد =========
-    function determinantSmallSymbolic(A) {
-      const n = A.length;
-      if (A[0].length !== n) throw new Error("A ليست مربّعة.");
-      if (n === 1) {
-        return cleanExpr(A[0][0]);
-      }
-      if (n === 2) {
-        const a = A[0][0], b = A[0][1], c = A[1][0], d = A[1][1];
-        return subExpr(mulExpr(a, d), mulExpr(b, c)); // ad - bc
-      }
-      if (n === 3) {
-        const a = A[0][0], b = A[0][1], c = A[0][2];
-        const d = A[1][0], e = A[1][1], f = A[1][2];
-        const g = A[2][0], h = A[2][1], i = A[2][2];
+    // ========= دوال مساعدة لحساب الإنفيرس بطريقة Adjugate =========
 
-        const term1 = mulExpr(a, mulExpr(e, i));
-        const term2 = mulExpr(b, mulExpr(f, g));
-        const term3 = mulExpr(c, mulExpr(d, h));
-        const pos = addExpr(term1, addExpr(term2, term3));
+    // الحصول على مصفوفة Minor بحذف صف وعمود معينين
+    function getMinor(matrix, rowToRemove, colToRemove) {
+      return matrix
+        .filter((_, r) => r !== rowToRemove)
+        .map(r => r.filter((_, c) => c !== colToRemove));
+    }
 
-        const term4 = mulExpr(c, mulExpr(e, g));
-        const term5 = mulExpr(b, mulExpr(d, i));
-        const term6 = mulExpr(a, mulExpr(f, h));
-        const neg = addExpr(term4, addExpr(term5, term6));
+    // محدد عام (يعمل بشكل تكراري للمصفوفات الصغيرة)
+    function determinantRecursive(matrix) {
+        const n = matrix.length;
+        if (n === 1) return cleanExpr(matrix[0][0]);
+        if (n === 2) {
+             const a = matrix[0][0], b = matrix[0][1], c = matrix[1][0], d = matrix[1][1];
+             return subExpr(mulExpr(a, d), mulExpr(b, c));
+        }
+        // للمصفوفات الأكبر (3x3 وما فوق)، نستخدم فك الصف الأول
+        let det = "0";
+        for (let j = 0; j < n; j++) {
+            const factor = matrix[0][j];
+            if (isZero(factor)) continue; // تخطي الأصفار لتسريع الحل
+            
+            const subMat = getMinor(matrix, 0, j);
+            const subDet = determinantRecursive(subMat);
+            
+            let term = mulExpr(factor, subDet);
+            
+            // قاعدة الإشارات (+ - +)
+            if (j % 2 === 1) { 
+                det = subExpr(det, term);
+            } else {
+                det = addExpr(det, term);
+            }
+        }
+        return det;
+    }
 
-        return subExpr(pos, neg);
+    // المصفوفة المصاحبة (Adjugate Matrix) = Transpose of Cofactor Matrix
+    function getAdjugate(matrix) {
+        const n = matrix.length;
+        const adj = Array.from({ length: n }, () => Array(n).fill("0"));
+        
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                // حساب Cofactor(i, j)
+                const minorMat = getMinor(matrix, i, j);
+                const minorDet = determinantRecursive(minorMat);
+                
+                // الإشارة (-1)^(i+j)
+                const sign = (i + j) % 2 === 0 ? 1 : -1;
+                let val = (sign === 1) ? minorDet : negateExpr(minorDet);
+                
+                // نضع القيمة في (j, i) لأن Adjugate هو Transpose للـ Cofactors
+                adj[j][i] = simplifyExprFull(val); 
+            }
+        }
+        return adj;
+    }
+
+    // ========= محدد (للعرض) =========
+    function determinant(matrix) {
+      const n = matrix.length;
+      if (matrix[0].length !== n) {
+        throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
       }
-      throw new Error("المحدد الرمزي مدعوم فقط لمصفوفات ١×١ و٢×٢ و٣×٣.");
+      
+      const symbolic = hasSymbolic(matrix);
+      // استخدام الطريقة التكرارية للرموز (حتى 4x4 معقولة في المتصفح)
+      if (symbolic || n <= 4) {
+          if (n > 4) throw new Error("المحدد الرمزي مدعوم حتى 4x4 فقط لضمان الأداء.");
+          const raw = determinantRecursive(matrix);
+          return simplifyExprFull(raw);
+      }
+      return determinantNumeric(matrix); // استخدام الطريقة العددية للمصفوفات الكبيرة
     }
 
     function determinantNumeric(A) {
@@ -1095,22 +1188,6 @@ c d
         }
       }
       return String(det * sign);
-    }
-
-    function determinant(matrix) {
-      const n = matrix.length;
-      if (matrix[0].length !== n) {
-        throw new Error("المحدد يُعرّف فقط للمصفوفات المربّعة (n×n).");
-      }
-      const symbolic = hasSymbolic(matrix);
-      if (symbolic) {
-        if (n <= 3) {
-          const raw = determinantSmallSymbolic(matrix);
-          return simplifyExprFull(raw);
-        }
-        throw new Error("حساب المحدد الرمزي لمصفوفة أكبر من ٣×٣ غير مدعوم حاليًا. استخدم قيم عددية أو مصفوفة أصغر.");
-      }
-      return determinantNumeric(matrix);
     }
 
     // ========= رتبة =========
@@ -1148,61 +1225,21 @@ c d
       return rankVal.toString();
     }
 
-    // ========= إنفيرس =========
-    function inverse(matrix) {
+    // ========= إنفيرس (للحساب فقط عند الحاجة في Ax=b) =========
+    // هذه الدالة تعود للشكل القديم فقط لاستخدامها في حل المعادلات إن لزم الأمر داخلياً
+    // لكن للعرض، سنستخدم المنطق الجديد في computeMainBtn
+    function inverseInternal(matrix) {
       const n = matrix.length;
-      if (matrix[0].length !== n) {
-        throw new Error("الإنفيرس يُحسب فقط للمصفوفات المربّعة (n×n).");
-      }
-
-      const symbolic = hasSymbolic(matrix);
-      if (symbolic && n === 2) {
-        const a = matrix[0][0], b = matrix[0][1], c = matrix[1][0], d = matrix[1][1];
-        const detA = determinantSmallSymbolic(matrix);
-        const detS = simplifyExprFull(detA);
-        if (isZero(detS)) {
-          throw new Error("المصفوفة غير قابلة للعكس (det(A) = 0 رمزيًا أو عدديًا).");
-        }
-        return [
-          [divExpr(d, detS), divExpr(negateExpr(b), detS)],
-          [divExpr(negateExpr(c), detS), divExpr(a, detS)]
-        ];
-      }
-
-      const M = matrix.map((row, i) => {
-        const left = row.map(x => cleanExpr(x));
-        const right = Array.from({ length: n }, (_, j) => (i === j ? "1" : "0"));
-        return left.concat(right);
-      });
-      const totalCols = 2 * n;
-      for (let col = 0; col < n; col++) {
-        let pivotRow = -1;
-        for (let r = col; r < n; r++) {
-          if (!isZero(M[r][col])) { pivotRow = r; break; }
-        }
-        if (pivotRow === -1) {
-          throw new Error("المصفوفة غير قابلة للعكس (det(A) = 0 تقريبًا).");
-        }
-        if (pivotRow !== col) {
-          const tmp = M[col]; M[col] = M[pivotRow]; M[pivotRow] = tmp;
-        }
-        const pivotVal = M[col][col];
-        for (let j = 0; j < totalCols; j++) {
-          M[col][j] = divExpr(M[col][j], pivotVal);
-        }
-        for (let i = 0; i < n; i++) {
-          if (i === col) continue;
-          const factor = M[i][col];
-          if (isZero(factor)) continue;
-          for (let j = 0; j < totalCols; j++) {
-            const corr = mulExpr(factor, M[col][j]);
-            M[i][j] = subExpr(M[i][j], corr);
+      const detVal = determinant(matrix);
+      if (isZero(detVal)) throw new Error("المحدد صفر، المصفوفة غير قابلة للعكس.");
+      
+      // نستخدم Adjugate ثم نقسم
+      const adj = getAdjugate(matrix);
+      const inv = Array.from({ length: n }, () => Array(n).fill("0"));
+      for(let i=0; i<n; i++){
+          for(let j=0; j<n; j++){
+              inv[i][j] = divExpr(adj[i][j], detVal);
           }
-        }
-      }
-      const inv = [];
-      for (let i = 0; i < n; i++) {
-        inv.push(M[i].slice(n, totalCols).map(cleanExpr));
       }
       return inv;
     }
@@ -1336,7 +1373,9 @@ c d
     }
 
     // ========= عرض مصفوفة =========
-    function renderMatrix(matrix, boxId, factorId, simplifyOn) {
+    // explicitMatrixToRender: إذا مررنا مصفوفة جاهزة (مثل Adjugate) لا نريد التبسيط التلقائي عليها
+    // manualFactorStr: نص العامل المشترك الذي نريد إجباره (مثل 1/det)
+    function renderMatrix(matrix, boxId, factorId, autoSimplify, explicitMatrixToRender, manualFactorStr) {
       const box = document.getElementById(boxId);
       const factorEl = factorId ? document.getElementById(factorId) : null;
 
@@ -1348,10 +1387,10 @@ c d
         return;
       }
 
-      let matToShow = matrix;
-      let factor = null;
+      let matToShow = explicitMatrixToRender || matrix;
+      let factor = manualFactorStr || null;
 
-      if (simplifyOn) {
+      if (!explicitMatrixToRender && autoSimplify) {
         const simp = simplifyMatrixCommonFactor(matrix);
         factor = simp.factor;
         matToShow = simp.matrix;
@@ -1359,9 +1398,14 @@ c d
 
       if (factorEl) {
         if (factor) {
-          factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
-        } else {
-          factorEl.textContent = "لم يتم إيجاد عامل مشترك بسيط للتبسيط.";
+            // تنسيق عرض العامل المشترك
+            if (factor.startsWith("1 /")) {
+                factorEl.textContent = "العامل المشترك (1/det): " + factor;
+            } else {
+                factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
+            }
+        } else if (autoSimplify) {
+          factorEl.textContent = "";
         }
       }
 
@@ -1384,61 +1428,6 @@ c d
       box.classList.remove("flash");
       void box.offsetWidth;
       box.classList.add("flash");
-    }
-
-    // ========= عمليات للمصفوفات (تبويب العمليات) =========
-    function addMatrices(A, B) {
-      if (A.length !== B.length || A[0].length !== B[0].length) {
-        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
-      }
-      const m = A.length, n = A[0].length;
-      const C = Array.from({ length: m }, () => Array(n).fill("0"));
-      for (let i = 0; i < m; i++) {
-        for (let j = 0; j < n; j++) {
-          C[i][j] = addExpr(A[i][j], B[i][j]);
-        }
-      }
-      return C;
-    }
-    function subMatrices(A, B) {
-      if (A.length !== B.length || A[0].length !== B[0].length) {
-        throw new Error("A و B لازم نفس الأبعاد للجمع/الطرح.");
-      }
-      const m = A.length, n = A[0].length;
-      const C = Array.from({ length: m }, () => Array(n).fill("0"));
-      for (let i = 0; i < m; i++) {
-        for (let j = 0; j < n; j++) {
-          C[i][j] = subExpr(A[i][j], B[i][j]);
-        }
-      }
-      return C;
-    }
-    function mulMatrices(A, B) {
-      const m = A.length, n = A[0].length, p = B[0].length;
-      if (B.length !== n) {
-        throw new Error("لـ A×B: عدد أعمدة A يجب أن يساوي عدد صفوف B.");
-      }
-      const C = Array.from({ length: m }, () => Array(p).fill("0"));
-      for (let i = 0; i < m; i++) {
-        for (let j = 0; j < p; j++) {
-          let sum = "0";
-          for (let k = 0; k < n; k++) {
-            sum = addExpr(sum, mulExpr(A[i][k], B[k][j]));
-          }
-          C[i][j] = sum;
-        }
-      }
-      return C;
-    }
-
-    function formatVectorNames(mat) {
-      if (!mat || mat[0].length !== 1) return "";
-      const lines = [];
-      for (let i = 0; i < mat.length; i++) {
-        const name = "x" + (i + 1);
-        lines.push(name + " = " + cleanExpr(mat[i][0]));
-      }
-      return lines.join("\n");
     }
 
     // ========= Tabs =========
@@ -1491,18 +1480,35 @@ c d
         rankMain.textContent = rnk;
 
         if (A.length === A[0].length) {
-          const detVal = determinant(A);
-          detMain.textContent = simplifyExprFull(detVal) || "0";
+          // حساب المحدد
+          const detValRaw = determinant(A);
+          const detValSimp = simplifyExprFull(detValRaw);
+          detMain.textContent = detValSimp || "0";
 
-          try {
-            const invMat = inverse(A);
-            renderMatrix(invMat, "inverseBoxMain", "inverseFactorMain", simplifyOn);
-          } catch (eInv) {
-            document.getElementById("inverseBoxMain").textContent =
-              "لا يمكن إيجاد الإنفيرس لهذه المصفوفة.\n" + (eInv.message || "");
-            document.getElementById("inverseFactorMain").textContent = "";
-            inverseNoteMain.textContent =
-              "غالبًا المحدّد يساوي صفر أو أن A مفردة.";
+          // حساب الإنفيرس
+          if (isZero(detValSimp)) {
+              document.getElementById("inverseBoxMain").textContent = "المحدد يساوي صفر (det = 0)، المصفوفة غير قابلة للعكس.";
+              inverseNoteMain.textContent = "هذه المصفوفة مفردة (Singular).";
+          } else {
+              try {
+                  // نحسب Adjugate Matrix
+                  const adj = getAdjugate(A);
+                  
+                  if (simplifyOn) {
+                      // في حالة التبسيط: نعرض Adjugate كما هي، ونكتب العامل المشترك 1/det
+                      const factorText = "1 / (" + detValSimp + ")";
+                      renderMatrix(A, "inverseBoxMain", "inverseFactorMain", false, adj, factorText);
+                      inverseNoteMain.textContent = "تم استخدام طريقة Adjugate لعزل المحدد.";
+                  } else {
+                      // في حالة عدم التبسيط: نقسم كل عنصر في Adjugate على det
+                      const finalInv = adj.map(row => row.map(cell => divExpr(cell, detValSimp)));
+                      renderMatrix(finalInv, "inverseBoxMain", "inverseFactorMain", false);
+                      inverseNoteMain.textContent = "تم تقسيم كل عنصر على المحدد.";
+                  }
+                  
+              } catch (eInv) {
+                 document.getElementById("inverseBoxMain").textContent = "خطأ في الحساب: " + eInv.message;
+              }
           }
         } else {
           detMain.textContent = "غير معرّف للمصفوفة غير المربّعة.";
@@ -1521,16 +1527,19 @@ c d
       matrixInputMain.value = "1 2 3\n0 1 4\n5 6 0";
     });
     document.getElementById("exampleMainVarBtn").addEventListener("click", () => {
-      matrixInputMain.value = "L/2 0\n0 L^2/4";
+      matrixInputMain.value = "L 0\n0 L^3";
     });
 
     // ========= Overlay للإنفيرس بالحجم الكامل =========
     const inverseOverlay = document.getElementById("inverseOverlay");
     const inverseOverlayBox = document.getElementById("inverseOverlayBox");
+    const overlayFactorLine = document.getElementById("overlayFactorLine");
     const inverseFullscreenBtnMain = document.getElementById("inverseFullscreenBtnMain");
     const closeOverlayBtn = document.getElementById("closeOverlayBtn");
+
     inverseFullscreenBtnMain.addEventListener("click", () => {
       inverseOverlayBox.innerHTML = document.getElementById("inverseBoxMain").innerHTML || "لا توجد نتيجة إنفيرس حالياً.";
+      overlayFactorLine.textContent = document.getElementById("inverseFactorMain").textContent;
       inverseOverlay.classList.add("show");
     });
     closeOverlayBtn.addEventListener("click", () => {
@@ -1562,37 +1571,7 @@ c d
         return;
       }
 
-      let matToShow = matrix;
-      let factor = null;
-      if (simplifyOps.checked) {
-        const simp = simplifyMatrixCommonFactor(matrix);
-        factor = simp.factor;
-        matToShow = simp.matrix;
-      }
-      if (factor) {
-        factorEl.textContent = "تم استخراج عامل مشترك: " + factor;
-      } else if (simplifyOps.checked) {
-        factorEl.textContent = "لم يتم إيجاد عامل مشترك بسيط للتبسيط.";
-      }
-
-      const table = document.createElement("table");
-      table.className = "matrix-table";
-      const tbody = document.createElement("tbody");
-      for (const row of matToShow) {
-        const tr = document.createElement("tr");
-        for (const cell of row) {
-          const td = document.createElement("td");
-          renderExprToCell(td, cell);
-          tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-      }
-      table.appendChild(tbody);
-      box.appendChild(table);
-
-      box.classList.remove("flash");
-      void box.offsetWidth;
-      box.classList.add("flash");
+      renderMatrix(matrix, "opsResultBox", "opsFactor", simplifyOps.checked);
     }
 
     document.getElementById("addBtn").addEventListener("click", () => {
@@ -1643,11 +1622,19 @@ c d
         if (A.length !== A[0].length) throw new Error("A لازم مربّعة (n×n) لحل Ax = b.");
         if (A.length !== b.length) throw new Error("عدد صفوف A لازم يساوي عدد عناصر b.");
 
-        const Ainv = inverse(A);
+        const Ainv = inverseInternal(A);
         const X = mulMatrices(Ainv, b);
-        const names = formatVectorNames(X);
-        let info = "حل Ax = b باستخدام x = A⁻¹ b.";
-        if (names) info += "\n\nالقيم الفردية للمتغيرات:\n" + names;
+        
+        // عرض أسماء المتغيرات
+        let info = "حل Ax = b.";
+        if(X && X.length > 0) {
+             const lines = [];
+             for (let i = 0; i < X.length; i++) {
+                lines.push("x" + (i + 1) + " = " + cleanExpr(X[i][0]));
+             }
+             info += "\n\nالقيم الفردية للمتغيرات:\n" + lines.join("\n");
+        }
+        
         renderOpsResult(X, info);
       } catch (err) {
         errorOps.textContent = err.message || String(err);
